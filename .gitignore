@@ -1,0 +1,34 @@
+# Audio recordings
+recordings/
+*.wav
+*.mp3
+*.ogg
+*.webm
+
+# SSL certificates
+ssl/
+*.pem
+*.key
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.env
+venv/
+.venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Backend generated
+backend/__pycache__/

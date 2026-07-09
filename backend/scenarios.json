@@ -1,0 +1,1468 @@
+{
+  "categories": [
+    {
+      "id": "job-interviews",
+      "name": "Job Interviews",
+      "icon": "💼",
+      "scenarios": [
+        {
+          "id": "tell-me-about-yourself",
+          "title": "Tell Me About Yourself",
+          "prompt": "Walk me through your background. Who are you professionally, what have you done, and what are you looking for next?",
+          "max_duration": 120,
+          "difficulty": "easy",
+          "context": {
+            "role": "IT Infrastructure Engineer",
+            "company": "Principality Building Society",
+            "salary": "£38,000-£48,000/yr",
+            "location": "Cardiff (Hybrid)",
+            "interviewer_tip": "They want someone who can handle BAU + project work. Emphasise the migration projects you've led."
+          }
+        },
+        {
+          "id": "why-this-role",
+          "title": "Why This Role?",
+          "prompt": "You're applying for a Network Engineer role at an IT services company. Why this role and why now? What makes you want to leave your current position?",
+          "max_duration": 90,
+          "difficulty": "medium",
+          "context": {
+            "role": "Network Engineer",
+            "company": "Stefanini UK Ltd",
+            "salary": "£28,000-£32,000/yr",
+            "location": "Bridgend (On-site)",
+            "interviewer_tip": "Be honest about wanting to grow into pure networking. Don't badmouth current employer."
+          }
+        },
+        {
+          "id": "biggest-weakness",
+          "title": "Biggest Weakness?",
+          "prompt": "What would you say is your biggest weakness, and what are you doing to work on it?",
+          "max_duration": 90,
+          "difficulty": "hard",
+          "context": {
+            "role": "2nd Line IT Support Engineer",
+            "company": "Admiral Group",
+            "salary": "£32,000-£38,000/yr",
+            "location": "Cardiff (Hybrid)",
+            "interviewer_tip": "Pick a real weakness, show self-awareness, have a concrete improvement plan."
+          }
+        },
+        {
+          "id": "describe-conflict",
+          "title": "A Difficult Situation",
+          "prompt": "Tell me about a time you handled a difficult situation at work. What happened, what did you do, and what was the outcome?",
+          "max_duration": 120,
+          "difficulty": "medium",
+          "context": {
+            "role": "NOC Engineer (1st Line)",
+            "company": "Indigo Telecom Group",
+            "salary": "£28,000-£38,000/yr",
+            "location": "Remote",
+            "interviewer_tip": "Use STAR format: Situation, Task, Action, Result. Quantify where possible."
+          }
+        },
+        {
+          "id": "where-see-yourself",
+          "title": "Where in 5 Years?",
+          "prompt": "Where do you see yourself in the next 5 years, and how does this role fit into that plan?",
+          "max_duration": 90,
+          "difficulty": "medium",
+          "context": {
+            "role": "Junior DevOps Engineer",
+            "company": "Companies House",
+            "salary": "£35,952-£37,970/yr",
+            "location": "Cardiff (Hybrid)",
+            "interviewer_tip": "Show ambition but tie it to the role. 'Designing infrastructure' beats 'I want your job'."
+          }
+        },
+        {
+          "id": "why-should-we-hire",
+          "title": "Why Hire You?",
+          "prompt": "There are other qualified candidates. Why should we pick you over them?",
+          "max_duration": 90,
+          "difficulty": "hard",
+          "context": {
+            "role": "Junior Security Analyst",
+            "company": "Bridewell",
+            "salary": "£28,000-£35,000/yr",
+            "location": "Cardiff (Hybrid)",
+            "interviewer_tip": "Your certs + real-world field experience is a rare combo at this level. Lean into that."
+          }
+        },
+        {
+          "id": "time-you-led",
+          "title": "Describe a Project You Led",
+          "prompt": "Tell me about a time you took the lead on a project or task. What was it, how did you organise it, and what was the outcome?",
+          "max_duration": 120,
+          "difficulty": "medium",
+          "context": {
+            "role": "IT Project Engineer",
+            "company": "Ever Nimble",
+            "salary": "£30,000-£36,000/yr",
+            "location": "Cardiff (Hybrid)",
+            "interviewer_tip": "You led DECT-to-HHT migrations. Talk about planning, coordinating with sites, and executing under time pressure."
+          }
+        },
+        {
+          "id": "handle-pressure",
+          "title": "How Do You Handle Pressure?",
+          "prompt": "This role has tight SLAs and high-pressure outage situations. How do you handle stress and keep a clear head?",
+          "max_duration": 90,
+          "difficulty": "medium",
+          "context": {
+            "role": "1st Line IT Support Analyst",
+            "company": "NHS Wales Shared Services",
+            "salary": "£24,000-£27,000/yr",
+            "location": "Cardiff (On-site)",
+            "interviewer_tip": "Give a real example. A site down, a deadline looming, a manager pushing. Show you keep methodical."
+          }
+        },
+        {
+          "id": "tech-skills-overview",
+          "title": "Walk Us Through Your Tech Stack",
+          "prompt": "We want to understand your technical skills. What technologies do you work with daily and how proficient are you in each?",
+          "max_duration": 120,
+          "difficulty": "easy",
+          "context": {
+            "role": "Desktop Support Specialist L2",
+            "company": "PCI Pharma Services",
+            "salary": "£28,000-£35,000/yr",
+            "location": "Cardiff (On-site)",
+            "interviewer_tip": "Mention VoIP, DECT, HHT, networking basics, CCNA knowledge, Active Directory, and ticketing systems."
+          }
+        },
+        {
+          "id": "why-gap-or-change",
+          "title": "Why the Career Shift?",
+          "prompt": "Your background is in VoIP and field engineering. Why are you applying for a more network-focused role now?",
+          "max_duration": 90,
+          "difficulty": "hard",
+          "context": {
+            "role": "Network Engineer",
+            "company": "Bridgend CBC",
+            "salary": "£34,000-£36,400/yr",
+            "location": "Bridgend (Hybrid)",
+            "interviewer_tip": "Frame it as a natural progression. VoIP is built on networking — you want to go deeper into the foundation."
+          }
+        }
+      ]
+    },
+    {
+      "id": "sales-calls",
+      "name": "Sales Calls",
+      "icon": "📞",
+      "scenarios": [
+        {
+          "id": "pitch-product",
+          "title": "Pitch a VoIP System",
+          "prompt": "You're selling a hosted VoIP system to a retail chain with 200 stores. They currently use aging ISDN. Pitch the upgrade in 60 seconds.",
+          "max_duration": 60,
+          "difficulty": "medium",
+          "context": {
+            "role": "VoIP Solutions Engineer",
+            "company": "Wildix Partner",
+            "industry": "Telecoms",
+            "vibe": "Centralised management, cost savings on ISDN lines, easier moves/adds/changes. You've done this for real."
+          }
+        },
+        {
+          "id": "objection-price",
+          "title": "Price Objection",
+          "prompt": "The customer says: 'Your hosted VoIP is too expensive. Our ISDN works fine and it's paid off.' Convince them otherwise.",
+          "max_duration": 90,
+          "difficulty": "hard",
+          "context": {
+            "role": "Solutions Engineer",
+            "company": "ETS Connect",
+            "industry": "Telecoms",
+            "vibe": "ISDN switch-off is coming. Maintenance costs on old kit. Flexibility to scale. Disaster recovery built in."
+          }
+        },
+        {
+          "id": "objection-happy",
+          "title": "Happy With Current Provider",
+          "prompt": "The prospect says: 'We're happy with BT. We've been with them 10 years. Why would we change?'",
+          "max_duration": 90,
+          "difficulty": "hard",
+          "context": {
+            "role": "Solutions Engineer",
+            "company": "Wildix Partner",
+            "industry": "Telecoms",
+            "vibe": "BT is expensive, slow to support, hosted VoIP isn't their priority. You offer better SLAs and quicker deployment."
+          }
+        },
+        {
+          "id": "objection-too-small",
+          "title": "Too Small for Hosted VoIP",
+          "prompt": "The customer says: 'We're only a 10-person office. Hosted VoIP sounds like overkill for us.'",
+          "max_duration": 90,
+          "difficulty": "medium",
+          "context": {
+            "role": "Solutions Engineer",
+            "company": "Wildix Partner",
+            "industry": "Telecoms",
+            "vibe": "Hosted VoIP scales down too — simpler setup, no on-site PBX, lower upfront cost. Perfect for small offices."
+          }
+        },
+        {
+          "id": "objection-security",
+          "title": "Security Concerns",
+          "prompt": "The IT manager says: 'I don't want my phone system on the internet. Too many security risks.' Address their concern.",
+          "max_duration": 90,
+          "difficulty": "hard",
+          "context": {
+            "role": "Solutions Engineer",
+            "company": "ETS Connect",
+            "industry": "Telecoms",
+            "vibe": "Encryption, segregated VLANs, SBCs, DDOS protection — hosted VoIP is often more secure than aging on-prem kit."
+          }
+        },
+        {
+          "id": "upsell-existing",
+          "title": "Upsell Add-On Features",
+          "prompt": "Your customer already has basic VoIP from you. Pitch them on adding call recording, softphones for remote workers, and a mobile app.",
+          "max_duration": 60,
+          "difficulty": "easy",
+          "context": {
+            "role": "Account Manager",
+            "company": "Wildix Partner",
+            "industry": "Telecoms",
+            "vibe": "They already trust you. Frame it as 'your team is asking for these features, here's how easy it is to add.'"
+          }
+        },
+        {
+          "id": "cold-call-decision-maker",
+          "title": "Cold Call — Decision Maker",
+          "prompt": "You're cold-calling an IT director at a 150-person company. You have 30 seconds to earn more time. Go.",
+          "max_duration": 45,
+          "difficulty": "hard",
+          "context": {
+            "role": "Business Development",
+            "company": "ETS Connect",
+            "industry": "Telecoms",
+            "vibe": "Hook them fast. 'Most IT directors I speak to are frustrated with their phone bill. Is that something on your radar?'"
+          }
+        },
+        {
+          "id": "objection-already-upgraded",
+          "title": "We Already Upgraded",
+          "prompt": "Prospect says: 'We just spent £15k on a new phone system last year. We're not changing again.'",
+          "max_duration": 90,
+          "difficulty": "hard",
+          "context": {
+            "role": "Solutions Engineer",
+            "company": "Wildix Partner",
+            "industry": "Telecoms",
+            "vibe": "Acknowledge their investment. Ask about support costs, what features they're missing, and when their support contract ends."
+          }
+        },
+        {
+          "id": "competitor-objection",
+          "title": "Competitor Is Cheaper",
+          "prompt": "'We got a quote from [competitor]. They're 30% cheaper than you. Match it or we walk.'",
+          "max_duration": 90,
+          "difficulty": "hard",
+          "context": {
+            "role": "Solutions Engineer",
+            "company": "ETS Connect",
+            "industry": "Telecoms",
+            "vibe": "Don't panic. Compare what's included — support SLAs, features, reliability. Cheaper often means less."
+          }
+        },
+        {
+          "id": "implementation-anxiety",
+          "title": "Implementation Seems Painful",
+          "prompt": "'Switching sounds like a nightmare. I can't have phones down for days — we're a 24/7 operation.'",
+          "max_duration": 90,
+          "difficulty": "medium",
+          "context": {
+            "role": "Solutions Engineer",
+            "company": "ETS Connect",
+            "industry": "Telecoms",
+            "vibe": "Phased rollout, parallel running, weekend cutovers. You've done this. Walk them through exactly how it works."
+          }
+        }
+      ]
+    },
+    {
+      "id": "difficult-convos",
+      "name": "Difficult Conversations",
+      "icon": "😬",
+      "scenarios": [
+        {
+          "id": "delayed-project",
+          "title": "Delayed Rollout",
+          "prompt": "You're 2 weeks behind on a 200-handset rollout because the client's WiFi infrastructure isn't ready. They're frustrated. Reset expectations.",
+          "max_duration": 90,
+          "difficulty": "hard",
+          "context": {
+            "role": "Field Engineer",
+            "company": "ETS Connect",
+            "vibe": "This is real. Take ownership, explain the blocker clearly, give a realistic new timeline."
+          }
+        },
+        {
+          "id": "coworker-conflict",
+          "title": "Teammate Not Pulling Weight",
+          "prompt": "You're on a deployment with a teammate who keeps disappearing, leaving you to do all the configs and testing. Address it.",
+          "max_duration": 90,
+          "difficulty": "hard",
+          "context": {
+            "role": "Field Engineer",
+            "company": "ETS Connect",
+            "vibe": "Assume good intent. 'I've noticed I've been handling most configs — everything okay on your end?'"
+          }
+        },
+        {
+          "id": "saying-no",
+          "title": "Too Many Sites, Too Little Time",
+          "prompt": "Your manager just added 3 more sites to your already-full week. You're doing 12-hour days. Push back without looking weak.",
+          "max_duration": 90,
+          "difficulty": "hard",
+          "context": {
+            "role": "Field Engineer",
+            "company": "ETS Connect",
+            "vibe": "'I can do X and Y this week, but Z slips to Monday. Which is the priority?'"
+          }
+        },
+        {
+          "id": "client-refuses-pay",
+          "title": "Client Refuses to Pay",
+          "prompt": "You completed a site deployment but the client is refusing to sign off, claiming the handsets 'don't sound right.' You know the config is correct. Handle it.",
+          "max_duration": 90,
+          "difficulty": "hard",
+          "context": {
+            "role": "Field Engineer",
+            "company": "ETS Connect",
+            "vibe": "Don't get defensive. Listen, investigate with them, show them the evidence, find a compromise."
+          }
+        },
+        {
+          "id": "mistake-on-site",
+          "title": "You Made a Mistake on Site",
+          "prompt": "You accidentally configured the wrong extension range on a 50-handset deployment. Half the users can't call out. You realise this after you've left site. Call the manager.",
+          "max_duration": 90,
+          "difficulty": "medium",
+          "context": {
+            "role": "Field Engineer",
+            "company": "ETS Connect",
+            "vibe": "Own it immediately. Apologise, explain the fix, give a precise time for when it'll be resolved."
+          }
+        },
+        {
+          "id": "unhappy-customer",
+          "title": "Customer Unhappy With Service",
+          "prompt": "A store manager calls you directly, furious that their handsets have been down for 3 hours. Their support ticket is still 'pending assignment.' They want answers.",
+          "max_duration": 90,
+          "difficulty": "hard",
+          "context": {
+            "role": "Field Engineer",
+            "company": "ETS Connect",
+            "vibe": "Let them vent first. Then take ownership — even if it's not your fault, you're the one they trust on the ground."
+          }
+        },
+        {
+          "id": "bad-feedback-to-colleague",
+          "title": "Giving Tough Feedback",
+          "prompt": "A junior engineer on your team keeps rushing through configs and making mistakes that you have to fix. You need to address it without crushing their confidence.",
+          "max_duration": 90,
+          "difficulty": "medium",
+          "context": {
+            "role": "Senior Field Engineer",
+            "company": "ETS Connect",
+            "vibe": "Criticise the behaviour, not the person. 'I've noticed a few config errors lately. Let's go through them together.'"
+          }
+        },
+        {
+          "id": "asking-for-raise",
+          "title": "Asking for a Raise",
+          "prompt": "You've been in the role 18 months, taken on more responsibility, and you know new hires are coming in at a higher rate. Ask your manager for a raise.",
+          "max_duration": 90,
+          "difficulty": "hard",
+          "context": {
+            "role": "Field / VoIP Engineer",
+            "company": "ETS Connect",
+            "vibe": "Come with evidence — projects completed, sites deployed, certs earned. Market-rate data helps too."
+          }
+        },
+        {
+          "id": "handing-in-notice",
+          "title": "Handing in Your Notice",
+          "prompt": "You've been offered a better role elsewhere. You need to resign professionally without burning bridges. Your current manager relies on you heavily.",
+          "max_duration": 90,
+          "difficulty": "medium",
+          "context": {
+            "role": "Field / VoIP Engineer",
+            "company": "ETS Connect",
+            "vibe": "Be grateful, be firm, offer to help with the transition. 'I've learned a lot here, but this opportunity is right for my career.'"
+          }
+        },
+        {
+          "id": "admitting-you-dont-know",
+          "title": "You Don't Know the Answer",
+          "prompt": "You're on site and the client asks a technical question you genuinely don't know the answer to. They're expecting you to be the expert. Handle it.",
+          "max_duration": 60,
+          "difficulty": "easy",
+          "context": {
+            "role": "Field Engineer",
+            "company": "ETS Connect",
+            "vibe": "'That's a great question — I want to make sure I give you the right answer. Let me check with our specialist and get back to you within the hour.'"
+          }
+        }
+      ]
+    },
+    {
+      "id": "presentations",
+      "name": "Presentations",
+      "icon": "🎤",
+      "scenarios": [
+        {
+          "id": "introduce-yourself",
+          "title": "Network Team Meeting Intro",
+          "prompt": "You're the new Network Engineer joining the team. It's your first team standup — 8 people on the call. Introduce yourself in a way that makes them want to work with you.",
+          "max_duration": 60,
+          "difficulty": "easy",
+          "context": {
+            "role": "Network Engineer",
+            "company": "Principality Building Society",
+            "vibe": "Warm and professional. Mention your background briefly, then express excitement about their projects."
+          }
+        },
+        {
+          "id": "explain-tech",
+          "title": "Explain VoIP to a Store Manager",
+          "prompt": "A store manager with zero tech background needs to understand why their handsets are being replaced. No jargon. They just care if the phone still works.",
+          "max_duration": 90,
+          "difficulty": "medium",
+          "context": {
+            "role": "Field Engineer",
+            "company": "ETS Connect",
+            "vibe": "'The old phone system is being switched off by the phone company. The new one runs over your internet and has more features.'"
+          }
+        },
+        {
+          "id": "leadership-update",
+          "title": "Project Update to Leadership",
+          "prompt": "You're presenting a 2-minute project update to the head of IT and the operations director. You've deployed 150 handsets across 30 sites so far. Give them a status update.",
+          "max_duration": 120,
+          "difficulty": "hard",
+          "context": {
+            "role": "Project Engineer",
+            "company": "ETS Connect",
+            "vibe": "Be concise. Progress, blockers, next steps. They don't need technical detail — they need confidence the project is on track."
+          }
+        },
+        {
+          "id": "train-new-starters",
+          "title": "Train New Starters on Process",
+          "prompt": "Three new field engineers are starting next week. You've been asked to give a 15-minute overview of your deployment process. Condense it to 2 minutes.",
+          "max_duration": 120,
+          "difficulty": "medium",
+          "context": {
+            "role": "Senior Field Engineer",
+            "company": "ETS Connect",
+            "vibe": "High-level steps: site survey → config prep → on-site deployment → testing → sign-off. Add the common pitfalls to watch for."
+          }
+        },
+        {
+          "id": "post-outage-review",
+          "title": "Explain an Outage to Management",
+          "prompt": "There was a 4-hour network outage across 50 retail sites last week. Non-technical leadership wants a clear explanation of what happened, why, and how you'll stop it recurring.",
+          "max_duration": 120,
+          "difficulty": "hard",
+          "context": {
+            "role": "Network / VoIP Engineer",
+            "company": "ETS Connect",
+            "vibe": "No jargon. 'A core router failed. The backup didn't kick in because of a config error. We've fixed both issues.'"
+          }
+        },
+        {
+          "id": "ccna-progress",
+          "title": "CCNA Study Presentation",
+          "prompt": "You're presenting to your study group or mentor on what you've learned this week in your CCNA studies. Pick a topic (routing, switching, OSPF, STP) and explain it.",
+          "max_duration": 120,
+          "difficulty": "medium",
+          "context": {
+            "role": "CCNA Student",
+            "company": "Self-study",
+            "vibe": "Use an analogy to make it stick. Frame it as 'this is what I learned, this is where I got stuck, this is how it applies to real networks.'"
+          }
+        },
+        {
+          "id": "sales-presentation",
+          "title": "Sales Presentation to Client",
+          "prompt": "You're presenting a hosted VoIP solution to a potential client's board. 3 decision-makers, 2 minutes, one shot. They need to see the value clearly.",
+          "max_duration": 120,
+          "difficulty": "hard",
+          "context": {
+            "role": "Solutions Engineer",
+            "company": "Wildix Partner",
+            "vibe": "Start with their pain point. End with the ROI. Keep slides minimal — you are the presentation."
+          }
+        },
+        {
+          "id": "team-retro",
+          "title": "Team Retrospective",
+          "prompt": "It's end-of-quarter retro. Share one thing that went well, one thing that didn't, and one thing you'd change for next quarter.",
+          "max_duration": 90,
+          "difficulty": "easy",
+          "context": {
+            "role": "Field Engineer",
+            "company": "ETS Connect",
+            "vibe": "Be honest but constructive. 'Our deployment speed improved, but site comms were patchy. I'd suggest a pre-site checklist.'"
+          }
+        },
+        {
+          "id": "business-case",
+          "title": "Business Case for New Equipment",
+          "prompt": "You need to convince your manager to approve £5k for new testing equipment (laptop, software licenses, test gear). Present the business case in 2 minutes.",
+          "max_duration": 120,
+          "difficulty": "medium",
+          "context": {
+            "role": "Field / VoIP Engineer",
+            "company": "ETS Connect",
+            "vibe": "Frame it as time saved vs cost. 'This equipment pays for itself in 3 months by reducing site revisits.'"
+          }
+        },
+        {
+          "id": "lightning-talk",
+          "title": "Conference Lightning Talk",
+          "prompt": "You're at a local tech meetup giving a 5-minute lightning talk. Topic: 'Lessons from Deploying VoIP at Scale — What I Wish I'd Known.' Condense it to 2 minutes.",
+          "max_duration": 120,
+          "difficulty": "hard",
+          "context": {
+            "role": "VoIP / Network Engineer",
+            "company": "ETS Connect",
+            "vibe": "Pick 3 lessons. Start with your biggest mistake (it's relatable). End with the key takeaway."
+          }
+        }
+      ]
+    },
+    {
+      "id": "dress-presentation",
+      "name": "Dress & Presentation",
+      "icon": "👔",
+      "scenarios": [
+        {
+          "id": "dress-interview",
+          "title": "Job Interview Outfit",
+          "prompt": "You're going for a Network Engineer interview. Take a full-body photo of what you're planning to wear.",
+          "max_duration": 15,
+          "difficulty": "easy",
+          "context": {
+            "role": "Network Engineer",
+            "company": "Stefanini / Principality BS",
+            "setting": "In-person interview",
+            "formality": "Smart casual to business formal",
+            "tip": "Collared shirt + smart trousers + clean shoes is the sweet spot. No tie needed unless it's finance."
+          }
+        },
+        {
+          "id": "dress-client-meeting",
+          "title": "Client Site Meeting",
+          "prompt": "Visiting a retail client for a 200-handset deployment. Show your site visit outfit.",
+          "max_duration": 15,
+          "difficulty": "easy",
+          "context": {
+            "role": "Field / VoIP Engineer",
+            "company": "ETS Connect",
+            "setting": "Client site",
+            "formality": "Smart casual + practical",
+            "tip": "Polo or collared shirt, dark jeans or chinos, sturdy clean shoes. Professional but ladder-ready."
+          }
+        },
+        {
+          "id": "dress-conference",
+          "title": "Tech Conference",
+          "prompt": "Attending a local tech conference / meetup. Show your networking outfit.",
+          "max_duration": 15,
+          "difficulty": "easy",
+          "context": {
+            "role": "Network / VoIP Engineer",
+            "company": "Self / ETS Connect",
+            "setting": "Conference",
+            "formality": "Smart casual with personality",
+            "tip": "Show some personality. Branded hoodie, smart jacket, interesting trainers — great conversation starters."
+          }
+        },
+        {
+          "id": "dress-first-day",
+          "title": "First Day at New Job",
+          "prompt": "First day at an IT Infrastructure role. Make a good impression without overdressing.",
+          "max_duration": 15,
+          "difficulty": "easy",
+          "context": {
+            "role": "IT Infrastructure Engineer",
+            "company": "Principality BS",
+            "setting": "First day / office",
+            "formality": "Smart casual +1 level",
+            "tip": "Better to overdress day one. Button-down, chinos, clean trainers — safe bet."
+          }
+        },
+        {
+          "id": "dress-sales-pitch",
+          "title": "Boardroom Sales Pitch",
+          "prompt": "Presenting a VoIP proposal to 3 decision-makers in a boardroom. What are you wearing?",
+          "max_duration": 15,
+          "difficulty": "medium",
+          "context": {
+            "role": "Solutions Engineer",
+            "company": "Wildix Partner",
+            "setting": "Boardroom presentation",
+            "formality": "Business formal",
+            "tip": "Suit jacket or smart blazer. Tie optional. First impressions in sales are everything."
+          }
+        },
+        {
+          "id": "dress-video-call",
+          "title": "Video Call Interview",
+          "prompt": "Zoom interview with a hiring manager. Show your top-half (what's visible on camera).",
+          "max_duration": 15,
+          "difficulty": "easy",
+          "context": {
+            "role": "IT Support / Network Engineer",
+            "company": "Various",
+            "setting": "Video call",
+            "formality": "Smart from waist up",
+            "tip": "Solid colours work best on camera. Avoid busy patterns or all-black. Good lighting matters too."
+          }
+        },
+        {
+          "id": "dress-casual-friday",
+          "title": "Casual Team Day",
+          "prompt": "No client meetings — internal work and team lunch. Balance comfortable vs presentable.",
+          "max_duration": 15,
+          "difficulty": "easy",
+          "context": {
+            "role": "IT / Field Engineer",
+            "company": "ETS Connect",
+            "setting": "Office / team day",
+            "formality": "Smart relaxed",
+            "tip": "Clean jeans, decent t-shirt or polo, trainers. No gym wear. You still represent the company."
+          }
+        },
+        {
+          "id": "dress-facial-hair",
+          "title": "Facial Hair Check",
+          "prompt": "Take a close-up of your face. The AI will review your facial hair grooming.",
+          "max_duration": 15,
+          "difficulty": "easy",
+          "context": {
+            "role": "Any",
+            "company": "Any",
+            "setting": "Grooming check",
+            "formality": "N/A",
+            "tip": "Facial hair is fine in IT. Define your neckline, trim strays, make it look intentional."
+          }
+        }
+      ]
+    },
+    {
+      "id": "negotiation",
+      "name": "Negotiation",
+      "icon": "🏆",
+      "scenarios": [
+        {
+          "id": "salary-negotiation-offer",
+          "title": "Negotiate Starting Salary",
+          "prompt": "You've just received a job offer for a Network Engineer role. The salary is £32k but you were hoping for £38k. They're expecting a counter. Negotiate.",
+          "max_duration": 90,
+          "difficulty": "hard",
+          "context": {
+            "role": "Network Engineer",
+            "company": "Bridgend CBC / Stefanini",
+            "salary": "Offered £32k, targeting £36-38k",
+            "location": "Bridgend / Cardiff",
+            "interviewer_tip": "Lead with value, not need. 'Based on my CCNA progress, field experience managing 200+ site deployments, and market data for this role in South Wales, I was hoping for £36k.' Be ready for 'that's the budget' and pivot to total comp."
+          }
+        },
+        {
+          "id": "scope-creep-pushback",
+          "title": "Push Back on Scope Creep",
+          "prompt": "A client asked you to 'just quickly' configure their entire 50-handset network during a standard deployment visit. This was not in scope. Push back professionally.",
+          "max_duration": 90,
+          "difficulty": "hard",
+          "context": {
+            "role": "Field Engineer",
+            "company": "ETS Connect",
+            "setting": "On-site at client",
+            "vibe": "'This wasn't in the scope I was given, but I can see it's important. Let me check what can be done today vs what needs a separate visit.' Keep it helpful, not defensive."
+          }
+        },
+        {
+          "id": "rate-negotiation-contract",
+          "title": "Contract Rate Negotiation",
+          "prompt": "A recruiter for a 6-month NOC contract offers you £175/day. You want £225/day based on your qualifications and experience. Negotiate with the recruiter.",
+          "max_duration": 90,
+          "difficulty": "hard",
+          "context": {
+            "role": "NOC Engineer (Contract)",
+            "company": "Indigo Telecom / Recruiter",
+            "salary": "Offered £175/day, targeting £200-225/day",
+            "vibe": "Recruiters expect negotiation. 'I'm looking at £200-225/day for this level of responsibility. I've got CCNA-level networking, VoIP expertise, and I can hit the ground running without ramp-up.'"
+          }
+        },
+        {
+          "id": "promotion-discussion",
+          "title": "Discussing a Promotion Path",
+          "prompt": "You've been a Field Engineer for 18 months. You want a clear path to Senior Field Engineer or moving into the NOC. Start the conversation with your manager.",
+          "max_duration": 120,
+          "difficulty": "medium",
+          "context": {
+            "role": "Field Engineer",
+            "company": "ETS Connect",
+            "vibe": "'I'm enjoying the role and I want to grow here. Can we talk about what it would take to move to the next level in the next 6-12 months?' Shows ambition without demands."
+          }
+        },
+        {
+          "id": "equipment-budget-pitch",
+          "title": "Pitch for Tooling Budget",
+          "prompt": "Your site laptop is 4 years old and crashing during deployments. You need a £1,200 replacement. Convince your manager without sounding like you're complaining.",
+          "max_duration": 90,
+          "difficulty": "easy",
+          "context": {
+            "role": "Field Engineer",
+            "company": "ETS Connect",
+            "vibe": "Frame it as productivity, not a complaint. 'My current laptop is struggling with multi-site configs and costing me about 2 hours per week in delays. A new one pays for itself in a few months.'"
+          }
+        },
+        {
+          "id": "consultant-upsell",
+          "title": "Upsell a Premium Service",
+          "prompt": "A happy existing client could benefit from your 24/7 NOC monitoring add-on (£500/month). They're not asking for it — sell them on the value of proactive monitoring.",
+          "max_duration": 90,
+          "difficulty": "medium",
+          "context": {
+            "role": "Account Manager / Engineer",
+            "company": "ETS Connect",
+            "vibe": "'You're running a 24/7 operation. Your current setup only alerts you when something breaks. The NOC service catches issues before they affect your stores. Here's how it saved [similar client] £3k in outage costs last quarter.'"
+          }
+        },
+        {
+          "id": "asking-for-ccna-support",
+          "title": "Ask for Exam Fee Sponsorship",
+          "prompt": "Your CCNA exam is £300 and you want the company to cover it. They've never sponsored certs before. Make the case.",
+          "max_duration": 90,
+          "difficulty": "medium",
+          "context": {
+            "role": "Field Engineer",
+            "company": "ETS Connect",
+            "vibe": "'My CCNA qualification directly benefits our VoIP work — better network troubleshooting, fewer repeat site visits, and it strengthens our credibility with clients. The exam costs less than a single repeat call-out.'"
+          }
+        },
+        {
+          "id": "post-offer-negotiation",
+          "title": "Counter a Lowball Offer",
+          "prompt": "You nailed the interview for a Junior Security Analyst role at Bridewell. They offered £26k. Market rate is £30k+. You have 48 hours to respond. Counter without losing the offer.",
+          "max_duration": 90,
+          "difficulty": "hard",
+          "context": {
+            "role": "Junior Security Analyst",
+            "company": "Bridewell",
+            "salary": "Offered £26k, targeting £30-32k",
+            "interviewer_tip": "Stay warm and enthusiastic about the role. 'I'm really excited about Bridewell and this team. Based on my certs, field experience, and similar roles in Cardiff, I was hoping for £30k. Is there flexibility?'"
+          }
+        }
+      ]
+    },
+    {
+      "id": "networking-relationships",
+      "name": "Networking & Relationships",
+      "icon": "🤝",
+      "scenarios": [
+        {
+          "id": "informational-interview",
+          "title": "Informational Interview Request",
+          "prompt": "You found a Senior Network Engineer on LinkedIn who works at Principality BS. You want to ask for 15 minutes of their time to learn about the role. Send a voice note / have the conversation.",
+          "max_duration": 60,
+          "difficulty": "easy",
+          "context": {
+            "role": "Aspiring Network Engineer",
+            "company": "Self / CCNA Student",
+            "vibe": "Be specific, respectful of time. 'Hi [Name], I'm currently studying for my CCNA and working as a VoIP field engineer. I'm really interested in moving into networking and saw your background at Principality. Could I buy you a coffee for 15 minutes to hear about your journey?'"
+          }
+        },
+        {
+          "id": "conference-follow-up",
+          "title": "Conference Follow-Up",
+          "prompt": "You met a hiring manager from Companies House at a Cardiff tech meetup. You had a great 5-minute chat. Send a follow-up message the next day.",
+          "max_duration": 60,
+          "difficulty": "easy",
+          "context": {
+            "role": "Network / VoIP Engineer",
+            "company": "Self",
+            "vibe": "Reference something specific from your chat. 'Great meeting you at the meetup — really enjoyed your point about IaC in the public sector. If you're ever looking for someone with field networking experience and CCNA-level knowledge, I'd love to chat.'"
+          }
+        },
+        {
+          "id": "linkedin-voice-intro",
+          "title": "LinkedIn Voice Introduction",
+          "prompt": "You're reaching out to the Head of IT at a company you'd love to work for. You don't know them. Leave a short professional voice intro / write a compelling first message.",
+          "max_duration": 45,
+          "difficulty": "medium",
+          "context": {
+            "role": "Network Engineer Candidate",
+            "company": "Various / Target Company",
+            "vibe": "Short, specific, value-first. 'Hi [Name], I'm a CCNA-qualified engineer with 3 years of VoIP deployment experience across 100+ sites. I've followed [Company]'s growth and would love to bring my networking skills to your team. Open to a 10-min chat?'"
+          }
+        },
+        {
+          "id": "asking-for-referral",
+          "title": "Ask for a Job Referral",
+          "prompt": "You know someone who works at a company you're applying to. You need to ask them for a referral without making it awkward.",
+          "max_duration": 60,
+          "difficulty": "medium",
+          "context": {
+            "role": "Job Seeker",
+            "company": "Self / Referral Target",
+            "vibe": "Make it easy for them. 'Hey [Name], I noticed [Company] is hiring for a Network Engineer role I'm perfect for. I know you there — would you feel comfortable referring me? Happy to send you my CV so you can see what to share.'"
+          }
+        },
+        {
+          "id": "introducing-self-to-team",
+          "title": "Introducing Yourself to a New Team",
+          "prompt": "You've just joined a new IT team. There's a Slack channel intro / team standup. Introduce yourself in a way that makes people want to work with you.",
+          "max_duration": 60,
+          "difficulty": "easy",
+          "context": {
+            "role": "Network / IT Engineer",
+            "company": "New employer",
+            "vibe": "'Hey team, I'm [Name]. I've spent the last few years doing VoIP deployments across Wales, and I'm currently finishing my CCNA. Looking forward to getting stuck into the network projects here. If anyone wants a coffee and a chat about networking or the best places for lunch in Cardiff, I'm all ears.'"
+          }
+        },
+        {
+          "id": "thank-you-after-interview",
+          "title": "Post-Interview Thank You",
+          "prompt": "You just finished a 2nd round interview for a Network Engineer role. Send a thank-you message that reinforces why you're the right person.",
+          "max_duration": 60,
+          "difficulty": "easy",
+          "context": {
+            "role": "Network Engineer Candidate",
+            "company": "Interview Target",
+            "vibe": "Reference a specific moment. 'Thanks again for your time today — especially the deep dive on your SD-WAN rollout. It confirmed this is exactly the kind of environment I want to grow in. I'm confident my field deployment experience and CCNA knowledge would add value from day one.'"
+          }
+        },
+        {
+          "id": "reconnecting-with-ex-colleague",
+          "title": "Reconnecting with a Former Colleague",
+          "prompt": "A former colleague has moved to a company you're targeting. You haven't spoken in 2 years. Reach out and rekindle the connection naturally.",
+          "max_duration": 60,
+          "difficulty": "medium",
+          "context": {
+            "role": "Network Engineer",
+            "company": "Self / Reconnect Target",
+            "vibe": "'Hey [Name], long time! I was thinking about our [project/deployment] days and saw you're at [Company] now — awesome. How's life treating you? I'd love to catch up properly.' Let it be genuine first, business second."
+          }
+        }
+      ]
+    },
+    {
+      "id": "tech-interviews",
+      "name": "Technical Interview Deep Dives",
+      "icon": "🔧",
+      "scenarios": [
+        {
+          "id": "explain-ospf",
+          "title": "Explain OSPF to a Non-Technical Manager",
+          "prompt": "Your manager (ex-accountant, now IT director) asks you to explain why you're recommending OSPF over static routing. No jargon. They need to justify it to the finance director.",
+          "max_duration": 90,
+          "difficulty": "medium",
+          "context": {
+            "role": "Network Engineer",
+            "company": "Various",
+            "interviewer_tip": "Analogy: 'Static routes are like giving someone directions every time they drive somewhere. OSPF is like giving them a GPS. If a road closes, the GPS finds another route automatically. This means less manual work for us and fewer outages for the business.'"
+          }
+        },
+        {
+          "id": "troubleshoot-scenario",
+          "title": "Walk Through a Network Troubleshooting Scenario",
+          "prompt": "A retail store reports that their phones and tills are offline. They can't process card payments. Walk the interviewer through your troubleshooting methodology from first notification to resolution.",
+          "max_duration": 120,
+          "difficulty": "hard",
+          "context": {
+            "role": "Network / Field Engineer",
+            "company": "ETS Connect / Target Company",
+            "interviewer_tip": "Think aloud, be methodical. 1) Is it just this site or multiple? 2) Check remote connectivity (ping gateway, DNS, WAN IP). 3) Check switch status / PoE for phones. 4) Check router logs. 5) Check ISP status. 6) Escalate or dispatch. SHOW don't just tell — use a real example."
+          }
+        },
+        {
+          "id": "design-vlan",
+          "title": "Design a VLAN Architecture for 3 Sites",
+          "prompt": "A client with 3 sites (HQ 200 users, warehouse 50, remote office 30) needs a VLAN architecture. They run VoIP, data, and CCTV on separate networks. Describe your design verbally.",
+          "max_duration": 120,
+          "difficulty": "hard",
+          "context": {
+            "role": "Network Engineer",
+            "company": "Client / Consultancy",
+            "interviewer_tip": "Cover: VLAN separation (Voice/Data/CCTV/Management/ Guest), VLAN tagging (trunk vs access ports), inter-VLAN routing at the core, QoS for voice traffic, and ACLs between CCTV and data. Mention 802.1Q and why you'd put VoIP on its own VLAN."
+          }
+        },
+        {
+          "id": "voip-call-flow",
+          "title": "Explain a VoIP Call Flow",
+          "prompt": "Interview question: 'Walk me through what happens when someone picks up a handset and makes a call on a hosted VoIP system.' Explain it clearly.",
+          "max_duration": 90,
+          "difficulty": "medium",
+          "context": {
+            "role": "VoIP / Network Engineer",
+            "company": "Target Company / Interview",
+            "interviewer_tip": "Step by step: 1) Phone registers with PBX via SIP (DHCP → DNS → SIP server). 2) User dials → phone sends INVITE via SIP. 3) PBX routes call (on-net or off-net via SIP trunk). 4) RTP stream established between endpoints. 5) Call termination via BYE. Mention codecs, NAT traversal, and what can go wrong (firewall, bandwidth, jitter)."
+          }
+        },
+        {
+          "id": "stp-troubleshoot",
+          "title": "Troubleshoot a Spanning Tree Loop",
+          "prompt": "A site has intermittent connectivity — devices lose connection for 30 seconds at a time. You suspect a spanning tree issue. Talk through your diagnosis and fix plan.",
+          "max_duration": 120,
+          "difficulty": "hard",
+          "context": {
+            "role": "Network Engineer / CCNA Candidate",
+            "company": "Interview / Technical Assessment",
+            "interviewer_tip": "Signs: intermittent connectivity, high CPU on switches, MAC flapping logs. Commands: show spanning-tree, show mac address-table, show interfaces. Look for: non-designated ports in forwarding state or topology change notifications every few seconds. Fix: trace the loop via CDP/LLDP, shut down the offending port, then redesign the topology."
+          }
+        },
+        {
+          "id": "ccna-subnetting",
+          "title": "Solve a Subnetting Problem Out Loud",
+          "prompt": "Interviewer: 'You have a /24 network and need 4 subnets with at least 50 hosts each. Walk me through your subnetting.' Do it verbally.",
+          "max_duration": 90,
+          "difficulty": "medium",
+          "context": {
+            "role": "CCNA Candidate",
+            "company": "Interview",
+            "interviewer_tip": "Talk through the math: need 6 bits for 50 hosts (2^6-2=62). Borrow 2 bits from /24 → /26 subnets. Each /26 has 64 addresses, 62 usable. Subnets: 0-63, 64-127, 128-191, 192-255. Network IDs: .0, .64, .128, .192. Mask: 255.255.255.192. Say it confidently — they're testing process, not speed."
+          }
+        },
+        {
+          "id": "explain-dhcp-dns",
+          "title": "Explain DHCP & DNS Interaction",
+          "prompt": "Interview question: 'A new laptop connects to the network and gets an IP via DHCP, but can't browse websites. Walk through the troubleshooting steps.'",
+          "max_duration": 90,
+          "difficulty": "easy",
+          "context": {
+            "role": "IT Support / Network Engineer",
+            "company": "Various / Interview",
+            "interviewer_tip": "1) Did it get an IP (ipconfig/ifconfig)? 2) Can it ping the gateway? 3) Can it ping 8.8.8.8? 4) Can it resolve a domain (nslookup)? 5) If DNS fails → check DNS server config in DHCP scope. If ping to 8.8.8.8 fails → check routing/firewall. Show systematic thinking."
+          }
+        },
+        {
+          "id": "firewall-basics",
+          "title": "Explain Stateful vs Stateless Firewall",
+          "prompt": "Your interviewer asks: 'What's the difference between a stateful and stateless firewall, and when would you use each?' Give a clear, practical answer.",
+          "max_duration": 60,
+          "difficulty": "medium",
+          "context": {
+            "role": "Network Engineer Candidate",
+            "company": "Interview / Technical Screen",
+            "interviewer_tip": "Stateful: tracks connection state, allows return traffic automatically, uses more resources. Stateless: checks each packet individually, faster but needs explicit rules for return traffic. Analogy: 'Stateful is a bouncer who remembers who's already inside. Stateless checks everyone's ID every time they walk past.'"
+          }
+        },
+        {
+          "id": "voice-vlan-qos",
+          "title": "Design QoS for Voice Traffic",
+          "prompt": "Your client reports choppy call quality on their new VoIP system. They have voice and data on the same switch. Walk through your QoS design recommendations.",
+          "max_duration": 90,
+          "difficulty": "hard",
+          "context": {
+            "role": "VoIP / Network Engineer",
+            "company": "ETS Connect / Client",
+            "interviewer_tip": "Steps: 1) Trust boundaries — set switchports to trust CoS/DSCP from IP phones. 2) Mark VoIP control (SIP) as AF41 and VoIP data (RTP) as EF. 3) Apply queuing — strict priority queue for EF traffic. 4) Police or shape best-effort traffic. 5) Test with iperf before and after. 'Voice is delay-sensitive, not bandwidth-hungry. 100kbps per call with proper QoS beats 1Gbps without it.'"
+          }
+        }
+      ]
+    },
+    {
+      "id": "career-growth",
+      "name": "Career Growth & Mentorship",
+      "icon": "📈",
+      "scenarios": [
+        {
+          "id": "asking-for-mentor",
+          "title": "Ask Someone to Mentor You",
+          "prompt": "A Senior Network Engineer at a client site seems willing to help. You want to ask them formally to mentor you through your CCNA-to-CCNP journey. Have the conversation.",
+          "max_duration": 90,
+          "difficulty": "medium",
+          "context": {
+            "role": "Junior Network / VoIP Engineer",
+            "company": "ETS Connect / Client Site",
+            "vibe": "'I really respect the way you handled that STP issue last week. I'm working through my CCNA and would love to learn from someone with your experience. Could I buy you a coffee every couple of weeks and pick your brain?' Humble, specific, low-commitment ask."
+          }
+        },
+        {
+          "id": "present-to-manager",
+          "title": "Present Your Growth Plan to Your Manager",
+          "prompt": "You want to transition from Field Engineer to Network Engineer within 18 months. Present a concrete development plan to your manager. Show them you've thought it through.",
+          "max_duration": 120,
+          "difficulty": "medium",
+          "context": {
+            "role": "Field Engineer",
+            "company": "ETS Connect",
+            "vibe": "'Here's my plan: CCNA complete by March, then I want to shadow the NOC team for one shift per month, take on more network-related tickets, and start my CCNP by September. I've identified 4 projects where I could add more value with networking skills.' Shows you've done the work before asking."
+          }
+        },
+        {
+          "id": "bad-performance-review",
+          "title": "Handle a Tough Performance Review",
+          "prompt": "Your manager says you've had too many repeat site visits and your ticket closure rate is below team average. Respond professionally without getting defensive.",
+          "max_duration": 90,
+          "difficulty": "hard",
+          "context": {
+            "role": "Field Engineer",
+            "company": "ETS Connect",
+            "vibe": "Listen first. 'I appreciate you bringing this up. I've noticed a few of those repeat visits too — usually tied to incomplete client-side prep. I'd like to suggest a pre-site checklist that catches these before I arrive. Can I draft one for us to review?' Turns criticism into solution."
+          }
+        },
+        {
+          "id": "asking-for-more-responsibility",
+          "title": "Ask for Stretch Assignments",
+          "prompt": "You've been doing standard deployments for a year. You want more challenging work — network design, client consulting, or training junior engineers. Ask without sounding bored or ungrateful.",
+          "max_duration": 90,
+          "difficulty": "medium",
+          "context": {
+            "role": "Field Engineer",
+            "company": "ETS Connect",
+            "vibe": "'I'm grateful for the deployment work — I've done 80+ sites now and I'm hitting my SLAs consistently. I'd love to start contributing on the network design side or helping train the new starters. Is there a project coming up where I could shadow or assist?'"
+          }
+        },
+        {
+          "id": "imposter-syndrome-conversation",
+          "title": "Talk Through Imposter Syndrome",
+          "prompt": "You're in a new role and feel out of your depth. Everyone else seems to know more. Talk it through with a trusted senior colleague who's been there.",
+          "max_duration": 90,
+          "difficulty": "easy",
+          "context": {
+            "role": "New Network Engineer",
+            "company": "Any new role",
+            "vibe": "'I'll be honest — I'm feeling a bit out of my depth. Everyone here has so much experience and I'm still connecting dots. Did you feel this way when you started? How did you get through it?' Vulnerability builds connection. They've all been there."
+          }
+        },
+        {
+          "id": "career-pivot-explanation",
+          "title": "Explain Your VoIP-to-Networking Pivot",
+          "prompt": "Interviewer asks: 'Your background is VoIP field engineering. Why networking?' Give a compelling answer that frames the shift as a natural progression, not a random change.",
+          "max_duration": 60,
+          "difficulty": "easy",
+          "context": {
+            "role": "Network Engineer Candidate",
+            "company": "Interview / Any",
+            "interviewer_tip": "'VoIP is networking with a voice application layer. Every deployment I've done — DECT migrations, QoS configs, VLAN segmentation, SIP trunking — is applied networking. I've loved the underlying infrastructure work more than the voice apps themselves, so I want to go deeper into the foundation.'"
+          }
+        },
+        {
+          "id": "certification-study-group",
+          "title": "Kick Off a Study Group",
+          "prompt": "You want to start a weekly CCNA study group at work or online. You need to pitch it to colleagues/managers and get buy-in.",
+          "max_duration": 60,
+          "difficulty": "easy",
+          "context": {
+            "role": "CCNA Student",
+            "company": "ETS Connect / Self",
+            "vibe": "'I'm proposing a weekly 1-hour CCNA study group — Wednesdays at lunch. We pick a topic, discuss real scenarios, and run through practice questions. It helps everyone pass faster and our team gets more certified engineers. Who's in?'"
+          }
+        },
+        {
+          "id": "professional-ghosting",
+          "title": "Re-engage After Ghosting a Recruiter",
+          "prompt": "A recruiter reached out 3 months ago. You were interested, then life got busy and you ghosted them. Now you want to re-engage without looking flaky.",
+          "max_duration": 60,
+          "difficulty": "easy",
+          "context": {
+            "role": "Job Seeker",
+            "company": "Self",
+            "vibe": "'Hi [Name], I owe you an apology — things got hectic on my end and I dropped the ball. I'm now in a position to pick up that conversation about the Network Engineer role if it's still open. No worries if it's gone, but I'd love to reconnect.' Honest and low-pressure."
+          }
+        }
+      ]
+    },
+    {
+      "id": "client-management",
+      "name": "Client Management",
+      "icon": "👥",
+      "scenarios": [
+        {
+          "id": "quarterly-review-meeting",
+          "title": "Quarterly Account Review",
+          "prompt": "You're presenting a quarterly review to a retail client with 30 sites. Services have been stable, but there were two short outages. Own them and present next quarter's plan.",
+          "max_duration": 120,
+          "difficulty": "hard",
+          "context": {
+            "role": "Account Manager / Engineer",
+            "company": "ETS Connect",
+            "vibe": "Lead with the good: '99.6% uptime across all sites this quarter.' Own the outages: 'Two incidents — one was an ISP failure (resolved in 45 min), one was a config issue we've patched.' Forward-looking: 'Next quarter we're upgrading 8 sites to redundant WAN links for free.'"
+          }
+        },
+        {
+          "id": "scope-creep-client",
+          "title": "Handle Scope Creep at Client Site",
+          "prompt": "You're on a standard deployment and the client keeps adding requests. 'While you're here, can you also...' They're now asking for 3 extra hours of work. Handle it.",
+          "max_duration": 90,
+          "difficulty": "medium",
+          "context": {
+            "role": "Field Engineer",
+            "company": "ETS Connect",
+            "vibe": "'I can definitely help with that. Let me check my schedule — I have another site after this. I can do X now, but Y and Z would need to be a separate visit or I can ask the office to extend my time here if that works for you.' Keeps you in control, not the client."
+          }
+        },
+        {
+          "id": "introducing-new-service",
+          "title": "Introducing a New Service to a Client",
+          "prompt": "Your company now offers a managed SD-WAN service alongside hosted VoIP. Present it to an existing client who doesn't know they need it yet.",
+          "max_duration": 90,
+          "difficulty": "medium",
+          "context": {
+            "role": "Solutions Engineer",
+            "company": "ETS Connect / Wildix Partner",
+            "vibe": "Start with their known pain: 'You've mentioned your branch offices struggle with call quality during peak times. SD-WAN solves that by intelligently routing traffic across multiple connections. It also gives you visibility into every site's performance from one dashboard.'"
+          }
+        },
+        {
+          "id": "walking-nontech-through-issue",
+          "title": "Explain a Complex Outage to a Non-Technical Client",
+          "prompt": "A store manager with zero tech background is furious that their phones have been down for 2 hours. They don't care about BGP flapping or SIP registration failures. Explain what happened in plain English.",
+          "max_duration": 90,
+          "difficulty": "easy",
+          "context": {
+            "role": "Field Engineer",
+            "company": "ETS Connect",
+            "vibe": "'Basically, the internet connection to your store had a problem that affected your phones. Think of it like a power cut — your phones couldn't reach the exchange. We've fixed it now and we're installing a backup line so if it happens again, your phones switch automatically without you noticing.'"
+          }
+        },
+        {
+          "id": "getting-buy-in-hardware-upgrade",
+          "title": "Get Buy-In for a Hardware Upgrade",
+          "prompt": "You've identified that a client's 5-year-old switches are causing intermittent issues. They don't want to spend £8k on replacements. Convince them it's worth it.",
+          "max_duration": 120,
+          "difficulty": "hard",
+          "context": {
+            "role": "Network / VoIP Engineer",
+            "company": "ETS Connect",
+            "vibe": "Don't lead with tech specs. Lead with cost of doing nothing: 'You've had 3 outages in 6 months related to those switches. Each outage costs you roughly £X in lost sales and staff downtime. The replacement pays for itself in under a year — and you get better call quality and faster troubleshooting.'"
+          }
+        },
+        {
+          "id": "managing-client-expectations",
+          "title": "Reset Unrealistic Project Timelines",
+          "prompt": "A client wants a 50-site VoIP rollout completed in 2 weeks. You know it needs 6 weeks minimum. Reset expectations without losing the deal.",
+          "max_duration": 90,
+          "difficulty": "hard",
+          "context": {
+            "role": "Project Engineer",
+            "company": "ETS Connect",
+            "vibe": "'I understand the urgency. Here's what's realistic: site surveys alone take 2 weeks for 50 sites. If we push too fast, we risk issues that cause downtime — which costs more than taking the extra time. I can get you a phased plan that delivers the first 10 sites in 3 weeks, then 10 per week after that.'"
+          }
+        },
+        {
+          "id": "client-complaint-de-escalation",
+          "title": "De-Escalate an Angry Client",
+          "prompt": "A client is shouting on the phone. Their entire phone system has been down for 6 hours and no one told them why. Their business is losing money every minute. Calm them down.",
+          "max_duration": 90,
+          "difficulty": "hard",
+          "context": {
+            "role": "Field Engineer / Support",
+            "company": "ETS Connect",
+            "vibe": "Let them vent first. Don't interrupt. Then: 'You're right to be angry. 6 hours is unacceptable and you deserved better communication. Here's what I know right now, here's what I'm doing to fix it, and here's exactly when you'll hear from me next. My personal number is [X] — call me directly if you don't get an update in 30 minutes.'"
+          }
+        },
+        {
+          "id": "firing-a-bad-client",
+          "title": "Gracefully Exit a Problem Client",
+          "prompt": "A client is consistently abusive to your field engineers, refuses to pay on time, and demands unreasonable SLA guarantees. Your manager has agreed you can let them go. Have the conversation.",
+          "max_duration": 90,
+          "difficulty": "hard",
+          "context": {
+            "role": "Account Manager / Lead Engineer",
+            "company": "ETS Connect",
+            "vibe": "Professional, final, no negotiation: 'After careful review, we've decided we're not the right fit for your needs going forward. We'll honour our notice period and ensure a smooth handover to your next provider. We recommend [Competitor] for your type of setup. Here's our transition plan.' No JADE (Justify, Argue, Defend, Explain)."
+          }
+        },
+        {
+          "id": "post-outage-follow-up",
+          "title": "Post-Outage Follow-Up & Restore Confidence",
+          "prompt": "A major outage affected a client for 4 hours last week. You fixed it. Now you need to follow up, explain the root cause, and restore their confidence in your service.",
+          "max_duration": 90,
+          "difficulty": "medium",
+          "context": {
+            "role": "Network Engineer",
+            "company": "ETS Connect",
+            "vibe": "'Here's what happened: [simple explanation]. Here's what we've done since: [concrete actions — redundant link installed, monitoring alert added, config hardened]. Here's our commitment: [specific SLA improvement]. We've taken this seriously — here's the written post-mortem if you want the technical detail.'"
+          }
+        }
+      ]
+    },
+    {
+      "id": "learning",
+      "name": "Learning — Teach It",
+      "icon": "📚",
+      "scenarios": [
+        {
+          "id": "learn-osi-model",
+          "title": "Explain the OSI Model",
+          "prompt": "Teach the OSI 7-layer model as if you're explaining it to a junior engineer who just started studying for their CCNA. Focus on what each layer does and a memorable way to remember them.",
+          "max_duration": 180,
+          "difficulty": "easy",
+          "context": {
+            "role": "CCNA Student (Teacher)",
+            "company": "Self-study",
+            "topic": "OSI Model",
+            "teaching_tip": "Use a real-world analogy (sending a letter, shipping a package). Layer 7 = what the user sees, Layer 1 = the wire. Mnemonic: 'All People Seem To Need Data Processing' — bottom up or top down."
+          }
+        },
+        {
+          "id": "learn-subnetting",
+          "title": "Teach Subnetting & VLSM",
+          "prompt": "Explain how subnetting works. Cover: why we subnet, the relationship between subnet mask and number of hosts, and how Variable Length Subnet Masks (VLSM) save addresses. Use an example.",
+          "max_duration": 240,
+          "difficulty": "medium",
+          "context": {
+            "role": "CCNA Student (Teacher)",
+            "company": "Self-study",
+            "topic": "Subnetting / VLSM",
+            "teaching_tip": "Start with 'why' not 'how'. A /24 has 254 hosts, but a small office needs 10 — you're wasting 244 addresses. That's why we subnet. Walk through an example: 192.168.1.0/24 into 4 subnets of 62 hosts each (/26)."
+          }
+        },
+        {
+          "id": "learn-vlans",
+          "title": "Explain VLANs to a Non-Technical Person",
+          "prompt": "Your store manager asks: 'Why can't the CCTV cameras talk to the same network as the tills and phones?' Explain VLANs in plain English so they understand the security and performance benefits.",
+          "max_duration": 120,
+          "difficulty": "easy",
+          "context": {
+            "role": "Field Engineer (Teacher)",
+            "company": "ETS Connect",
+            "topic": "VLANs",
+            "teaching_tip": "Analogy: 'VLANs are like separate rooms in a house. The tills and phones are in the living room, CCTV is in a locked office. They share one building (the switch), but can't walk into each other's rooms without permission.' Then explain trunking as 'a hallway connecting the rooms.'"
+          }
+        },
+        {
+          "id": "learn-ospf",
+          "title": "Explain How OSPF Works",
+          "prompt": "Teach OSPF basics: what it is, how routers discover each other, how they build a topology map, and why OSPF converges faster than RIP. Keep it accessible for a CCNA student.",
+          "max_duration": 240,
+          "difficulty": "hard",
+          "context": {
+            "role": "CCNA Student (Teacher)",
+            "company": "Self-study",
+            "topic": "OSPF",
+            "teaching_tip": "Frame it as: 'OSPF routers are like neighbours on a street. They say hello, exchange their address books, and everyone ends up with a complete map of the neighbourhood.' Cover: hello packets, LSAs, DR/BDR on multi-access, SPF algorithm. Stick to single-area OSPF."
+          }
+        },
+        {
+          "id": "learn-stp",
+          "title": "Explain Spanning Tree Protocol",
+          "prompt": "Teach STP: why we need it (broadcast storms, MAC table instability, multiple frame copies), how it works (root bridge, root ports, designated ports), and what happens when a link fails.",
+          "max_duration": 240,
+          "difficulty": "hard",
+          "context": {
+            "role": "CCNA Student (Teacher)",
+            "company": "Self-study",
+            "topic": "Spanning Tree Protocol",
+            "teaching_tip": "Analogy: 'Redundant links are like having two roads to the same town. Great for reliability, but without STP it's like the GPS telling everyone to take both roads at once — total chaos.' Use the port roles: root, designated, alternate/blocking. Show a simple topology."
+          }
+        },
+        {
+          "id": "learn-nat",
+          "title": "Explain NAT & PAT",
+          "prompt": "Explain how NAT allows hundreds of devices to share one public IP address. Cover: static NAT, dynamic NAT, and PAT (overload). Use a real-world analogy.",
+          "max_duration": 180,
+          "difficulty": "medium",
+          "context": {
+            "role": "CCNA Student (Teacher)",
+            "company": "Self-study",
+            "topic": "NAT / PAT",
+            "teaching_tip": "Analogy: 'NAT is like a company receptionist. Everyone in the building has an internal extension (private IP). When someone calls, they dial the main number (public IP) and the receptionist directs them to the right person. PAT is the receptionist remembering who called whom.'"
+          }
+        },
+        {
+          "id": "learn-tcp-vs-udp",
+          "title": "Explain TCP vs UDP",
+          "prompt": "Teach the difference between TCP and UDP. Cover: connection-oriented vs connectionless, reliability vs speed, sequencing and acknowledgements, and real-world examples of when to use each.",
+          "max_duration": 120,
+          "difficulty": "easy",
+          "context": {
+            "role": "CCNA Student (Teacher)",
+            "company": "Self-study",
+            "topic": "TCP vs UDP",
+            "teaching_tip": "TCP is like a registered postal service — every package is tracked, signed for, and resent if lost. UDP is like tossing a frisbee — fast, no tracking, you just hope someone catches it. Examples: TCP = web browsing, email. UDP = VoIP, video streaming, gaming."
+          }
+        },
+        {
+          "id": "learn-dns-resolution",
+          "title": "Explain DNS Resolution Step by Step",
+          "prompt": "Walk through what happens when someone types 'google.com' into a browser and presses Enter. Cover: browser cache, OS cache, recursive resolver, root servers, TLD servers, authoritative servers.",
+          "max_duration": 180,
+          "difficulty": "easy",
+          "context": {
+            "role": "CCNA Student (Teacher)",
+            "company": "Self-study",
+            "topic": "DNS Resolution",
+            "teaching_tip": "An analogy works well here. 'DNS is the phonebook of the internet. When you type a name, your computer asks around until it finds the number (IP address).' Walk each step: local cache → ISP resolver → root → .com → google.com → TTL and caching."
+          }
+        },
+        {
+          "id": "learn-dhcp-dora",
+          "title": "Explain the DHCP DORA Process",
+          "prompt": "Teach how DHCP works. Cover: the four-step DORA process (Discover, Offer, Request, Acknowledge), why each step exists, and what happens if a device can't reach a DHCP server (APIPA).",
+          "max_duration": 120,
+          "difficulty": "easy",
+          "context": {
+            "role": "CCNA Student (Teacher)",
+            "company": "Self-study",
+            "topic": "DHCP",
+            "teaching_tip": "Analogy: 'DHCP is like a hotel check-in. Discover = 'got any free rooms?' Offer = 'Room 204 is available.' Request = 'I'll take room 204.' Acknowledge = 'Here's your key card (and rules: checkout time, restaurant hours).'' DORA must be taught in order — each step depends on the last."
+          }
+        },
+        {
+          "id": "learn-ethernet-switching",
+          "title": "Explain Ethernet Switching Basics",
+          "prompt": "Teach how a switch learns MAC addresses and forwards frames. Cover: MAC address table (CAM table), flooding for unknown unicast, filtering, and the difference between hubs and switches.",
+          "max_duration": 150,
+          "difficulty": "medium",
+          "context": {
+            "role": "CCNA Student (Teacher)",
+            "company": "Self-study",
+            "topic": "Ethernet Switching",
+            "teaching_tip": "Before switching, explain why hubs were bad (collision domains, half-duplex). Then: 'A switch builds a map of which MAC lives on which port. First time it sees a frame, it floods (knocks on every door). Next time, it knows exactly which door to knock.' Cover: learning, forwarding, filtering, aging."
+          }
+        },
+        {
+          "id": "learn-acls",
+          "title": "Teach Access Control Lists (ACLs)",
+          "prompt": "Explain ACLs: what they're used for, the difference between standard and extended ACLs, how wildcard masks work, and the implied 'deny any' at the end. Walk through a real example of securing a router's management access.",
+          "max_duration": 180,
+          "difficulty": "medium",
+          "context": {
+            "role": "CCNA Student (Teacher)",
+            "company": "Self-study",
+            "topic": "Access Control Lists",
+            "teaching_tip": "Analogy: 'ACLs are like a bouncer's guest list at a club. Standard ACL = checks only your name (source IP). Extended ACL = checks your name, who you're visiting, what you're carrying, and which entrance you use.' Emphasise the implicit deny at the end and top-down processing."
+          }
+        },
+        {
+          "id": "learn-etherchannel",
+          "title": "Explain EtherChannel & Link Aggregation",
+          "prompt": "Teach EtherChannel: why STP wastes bandwidth on redundant links and how EtherChannel bundles them into one logical link. Cover LACP vs PAgP, load balancing by flow, and configuration basics.",
+          "max_duration": 180,
+          "difficulty": "medium",
+          "context": {
+            "role": "CCNA Student (Teacher)",
+            "company": "Self-study",
+            "topic": "EtherChannel",
+            "teaching_tip": "Analogy: 'STP is like having 4 motorways between two cities but only allowing traffic on one — the other three sit empty. EtherChannel merges them into one 4-lane motorway with traffic distributed by flow.' LACP = open standard (active/passive), PAgP = Cisco proprietary (desirable/auto)."
+          }
+        },
+        {
+          "id": "learn-inter-vlan-routing",
+          "title": "Explain Inter-VLAN Routing",
+          "prompt": "Teach how devices in different VLANs communicate. Cover: legacy (separate interfaces), router-on-a-stick with subinterfaces and 802.1Q trunking, and Layer 3 switching. Explain why each method exists and when to use it.",
+          "max_duration": 180,
+          "difficulty": "medium",
+          "context": {
+            "role": "CCNA Student (Teacher)",
+            "company": "Self-study",
+            "topic": "Inter-VLAN Routing",
+            "teaching_tip": "Analogy: 'VLANs are like different floors in a building. People on floor 2 (VLAN 20) can't talk to floor 3 (VLAN 30) without stairs or a lift. Router-on-a-stick is a single staircase. A Layer 3 switch is multiple express lifts.' Emphasise: subinterfaces, encapsulation dot1q, and the native VLAN."
+          }
+        },
+        {
+          "id": "learn-ipv6-basics",
+          "title": "Teach IPv6 Addresses & Why It Exists",
+          "prompt": "Explain IPv6: why NAT was a workaround not a solution, the 128-bit address format, compression rules (leading zeros, double colon), and the different address types (global unicast, link-local, unique local).",
+          "max_duration": 180,
+          "difficulty": "hard",
+          "context": {
+            "role": "CCNA Student (Teacher)",
+            "company": "Self-study",
+            "topic": "IPv6 Addressing",
+            "teaching_tip": "Start with the 'why': 'NAT breaks end-to-end connectivity. IP phones need real public IPs for SIP/RTP to work properly. IPv6 restores true end-to-end.' Then: 128 bits, 8 groups of 4 hex digits. Show compression: 2001:0db8:0000:0000:0000:8a2e:0370:7334 → 2001:db8::8a2e:370:7334."
+          }
+        },
+        {
+          "id": "learn-hsrp",
+          "title": "Explain HSRP & First Hop Redundancy",
+          "prompt": "Teach First Hop Redundancy Protocols, focusing on HSRP. Explain why you need a virtual gateway IP, how the active/standby election works, and what happens when the active router fails. Cover the difference between HSRP and VRRP.",
+          "max_duration": 180,
+          "difficulty": "hard",
+          "context": {
+            "role": "CCNA Student (Teacher)",
+            "company": "Self-study",
+            "topic": "HSRP / FHRP",
+            "teaching_tip": "Analogy: 'HSRP is like having a backup pilot. The active router flies the plane (forwards traffic), the standby watches the instruments. If the active fails, the standby takes over instantly — the passengers (clients) don't even notice.' The virtual IP stays the same, so clients never reconfigure."
+          }
+        },
+        {
+          "id": "learn-port-security",
+          "title": "Teach Switch Port Security",
+          "prompt": "Explain port security: why you'd limit MAC addresses on a switchport, sticky MAC learning, the three violation modes (shutdown, restrict, protect), and how to recover from err-disabled state. Use a real access port example.",
+          "max_duration": 150,
+          "difficulty": "easy",
+          "context": {
+            "role": "CCNA Student (Teacher)",
+            "company": "Self-study",
+            "topic": "Port Security",
+            "teaching_tip": "Analogy: 'Port security is like a hotel key card — only the registered guest (specific MAC) can enter that room (port). If someone else tries, security escorts them out.' Emphasise: shutdown = default (err-disabled, needs manual recovery), restrict = logs but stays up, protect = silently drops, no log."
+          }
+        },
+        {
+          "id": "learn-qos-voip",
+          "title": "Explain Why QoS Matters for VoIP",
+          "prompt": "Teach QoS fundamentals: why converged networks need it, the three QoS tools (queuing, shaping, policing), and how CoS and DSCP markings work. Use VoIP as the primary example since that's what you work with daily.",
+          "max_duration": 240,
+          "difficulty": "medium",
+          "context": {
+            "role": "Field Engineer (Teacher)",
+            "company": "ETS Connect",
+            "topic": "QoS for VoIP",
+            "teaching_tip": "Start with your real experience: 'Before convergence, voice ran on dedicated phone lines — no competition. Now voice, data, and video share one pipe. Without QoS, a big download can make a phone call choppy.' Cover: CoS 5 = voice payload, DSCP EF (46) = expedited forwarding for RTP. Trust boundaries on switchports."
+          }
+        },
+        {
+          "id": "learn-stp-enhancements",
+          "title": "Teach STP Enhancements: PortFast, BPDU Guard & Root Guard",
+          "prompt": "Explain the three critical STP edge features: PortFast (instant forwarding for access ports), BPDU Guard (shuts down ports that receive BPDUs), and Root Guard (prevents rogue switches from becoming root bridge). Cover when and why to use each.",
+          "max_duration": 180,
+          "difficulty": "medium",
+          "context": {
+            "role": "CCNA Student (Teacher)",
+            "company": "Self-study",
+            "topic": "STP Enhancements",
+            "teaching_tip": "Analogy: 'Access ports are like the building's front door. You don't make visitors wait 30 seconds (STP convergence) every time they walk in — that's PortFast. BPDU Guard is a security guard checking: if a guest tries to sneak STP messages from an access port, they get kicked out immediately (err-disabled).'"
+          }
+        },
+        {
+          "id": "learn-wan-vpn",
+          "title": "Explain WAN Technologies & VPNs",
+          "prompt": "Teach WAN fundamentals: the difference between LAN, MAN, and WAN. Cover site-to-site vs remote-access VPNs, how IPsec + GRE work together for encrypted site-to-site tunnels, and why you'd choose a VPN over a private MPLS circuit.",
+          "max_duration": 210,
+          "difficulty": "hard",
+          "context": {
+            "role": "CCNA Student (Teacher)",
+            "company": "Self-study",
+            "topic": "WANs & VPNs",
+            "teaching_tip": "Analogy: 'A WAN is the motorway network connecting cities (sites). VPN is a secure armoured car travelling on that motorway. GRE wraps your cargo in a box. IPsec locks the box. GRE over IPsec = locked armoured car that can drive through any route (including OSPF updates).'"
+          }
+        }
+      ]
+    },
+    {
+      "id": "live",
+      "name": "Live Conversations",
+      "icon": "🎙️",
+      "scenarios": [
+        {
+          "id": "live-placeholder",
+          "title": "🎙️ Live Practice",
+          "prompt": "Live practice session with Personaplex. Speak to a realistic AI persona.",
+          "max_duration": 180,
+          "difficulty": "medium",
+          "context": {
+            "role": "You",
+            "company": "Personaplex",
+            "setting": "Live conversation",
+            "formality": "Natural",
+            "tip": "Coming soon — real-time conversations with AI personas."
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,1696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <title>Presentation Confidence Game</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --bg: #0a0a0f;
+            --surface: rgba(255,255,255,0.04);
+            --surface-hover: rgba(255,255,255,0.08);
+            --glass: rgba(255,255,255,0.06);
+            --glass-border: rgba(255,255,255,0.08);
+            --text: #f0eeef;
+            --text-muted: rgba(255,255,255,0.45);
+            --pink: #ff4d79;
+            --purple: #8b5cf6;
+            --cyan: #22d3ee;
+            --green: #4ade80;
+            --orange: #fb923c;
+            --gold: #fbbf24;
+            --radius: 16px;
+            --radius-sm: 10px;
+            --radius-xl: 24px;
+        }
+        body {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            background: var(--bg);
+            background-image:
+                radial-gradient(ellipse 80% 60% at 50% -20%, rgba(139,92,246,0.12) 0%, transparent 70%),
+                radial-gradient(ellipse 60% 50% at 80% 80%, rgba(34,211,238,0.06) 0%, transparent 60%),
+                radial-gradient(ellipse 50% 40% at 20% 90%, rgba(255,77,121,0.06) 0%, transparent 50%);
+            color: var(--text); min-height: 100vh; line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+        }
+        header {
+            padding: 0.85rem 1.5rem; display: flex; align-items: center; gap: 0.75rem;
+            border-bottom: 1px solid var(--glass-border);
+            background: rgba(10,10,15,0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            position: sticky; top: 0; z-index: 50;
+        }
+        header h1 {
+            font-size: 1.1rem; font-weight: 800;
+            background: linear-gradient(135deg, var(--pink), var(--purple));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .back-btn {
+            background: var(--glass); border: 1px solid var(--glass-border);
+            color: var(--text); padding: 0.35rem 0.7rem; border-radius: 12px;
+            cursor: pointer; font-size: 0.8rem; display: none; font-weight: 600;
+            backdrop-filter: blur(10px); transition: all 0.2s;
+        }
+        .back-btn:hover { background: var(--surface-hover); transform: scale(1.05); }
+        /* Player Stats */
+        .player-stats {
+            display: flex; align-items: center; gap: 0.6rem; margin-left: auto;
+        }
+        .player-stats .level-badge {
+            background: linear-gradient(135deg, var(--purple), var(--pink));
+            padding: 0.2rem 0.65rem; border-radius: 20px; font-weight: 700; font-size: 0.65rem;
+            box-shadow: 0 2px 12px rgba(139,92,246,0.3);
+        }
+        .player-stats .pts { color: var(--gold); font-weight: 700; font-size: 0.75rem; }
+        .player-stats .tier-dots { display: flex; gap: 4px; }
+        .player-stats .tier-dot {
+            width: 7px; height: 7px; border-radius: 50%;
+            box-shadow: 0 0 6px currentColor;
+        }
+        .player-stats .tier-dot.easy { background: var(--green); color: var(--green); }
+        .player-stats .tier-dot.medium { background: var(--orange); color: var(--orange); }
+        .player-stats .tier-dot.hard { background: var(--pink); color: var(--pink); }
+        .player-stats .tier-dot.locked { background: rgba(255,255,255,0.1); color: transparent; box-shadow: none; }
+
+        .container { max-width: 800px; margin: 0 auto; padding: 1.5rem 1.25rem; }
+        .view { display: none; animation: fadeUp 0.3s ease; }
+        .view.active { display: block; }
+        @keyframes fadeUp { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+
+        /* Progress */
+        .progress-section {
+            background: var(--glass); border: 1px solid var(--glass-border);
+            border-radius: var(--radius-xl); padding: 1.25rem 1.5rem;
+            backdrop-filter: blur(12px); margin-bottom: 1.5rem;
+        }
+        .progress-section h3 { font-size: 0.9rem; font-weight: 600; margin-bottom: 0.75rem; color: var(--text-muted); }
+        .tier-bar {
+            display: flex; gap: 6px; margin-bottom: 0.6rem;
+        }
+        .tier-bar .seg {
+            flex: 1; height: 8px; border-radius: 6px; background: rgba(255,255,255,0.06);
+            overflow: hidden; position: relative;
+        }
+        .tier-bar .seg .fill {
+            height: 100%; border-radius: 6px; transition: width 0.6s cubic-bezier(0.34,1.56,0.64,1);
+            position: relative;
+        }
+        .tier-bar .seg.easy .fill { background: linear-gradient(90deg, var(--green), #22c55e); }
+        .tier-bar .seg.medium .fill { background: linear-gradient(90deg, var(--orange), #f97316); }
+        .tier-bar .seg.hard .fill { background: linear-gradient(90deg, var(--pink), #e11d48); }
+        .tier-bar .seg .fill::after {
+            content: ''; position: absolute; inset: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            animation: shimmer 2s infinite;
+        }
+        @keyframes shimmer { 0% { transform:translateX(-100%); } 100% { transform:translateX(100%); } }
+        .tier-labels {
+            display: flex; justify-content: space-between; font-size: 0.7rem;
+        }
+        .tier-labels span { display: flex; align-items: center; gap: 0.3rem; color: var(--text-muted); }
+        .tier-labels span b { color: var(--text); }
+
+        /* Category Grid */
+        .category-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 0.75rem; margin-top: 0.75rem;
+        }
+        .category-card {
+            background: var(--glass); border: 1px solid var(--glass-border);
+            border-radius: var(--radius); padding: 1rem 0.75rem; cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1); text-align: center;
+            backdrop-filter: blur(8px);
+        }
+        .category-card:hover {
+            background: var(--surface-hover); transform: translateY(-4px) scale(1.02);
+            border-color: rgba(255,255,255,0.15);
+            box-shadow: 0 8px 32px rgba(139,92,246,0.15);
+        }
+        .category-card .icon { font-size: 2rem; margin-bottom: 0.3rem; display: block; }
+        .category-card h3 { font-size: 0.85rem; font-weight: 600; }
+        .category-card .count { color: var(--text-muted); font-size: 0.7rem; margin-top: 0.15rem; }
+
+        /* Scenario List */
+        .scenario-list { margin-top: 0.75rem; }
+        .scenario-item {
+            background: var(--glass); border: 1px solid var(--glass-border);
+            border-radius: var(--radius); padding: 0.9rem 1.15rem; margin-bottom: 0.5rem;
+            cursor: pointer; transition: all 0.2s;
+            display: flex; justify-content: space-between; align-items: center;
+            backdrop-filter: blur(8px);
+        }
+        .scenario-item:hover { background: var(--surface-hover); transform: translateX(4px); }
+        .scenario-item.completed {
+            border-color: rgba(74,222,128,0.2);
+            background: rgba(74,222,128,0.03);
+        }
+        .scenario-item.locked { opacity: 0.35; cursor: not-allowed; }
+        .scenario-item.locked:hover { transform: none; background: var(--glass); }
+        .scenario-item .title { font-weight: 600; font-size: 0.9rem; display: flex; align-items: center; gap: 0.4rem; }
+        .scenario-item .meta { color: var(--text-muted); font-size: 0.7rem; margin-top: 0.15rem; }
+        .scenario-item .completion-badge {
+            display: inline-flex; align-items: center; gap: 0.2rem;
+            font-size: 0.65rem; padding: 0.15rem 0.4rem; border-radius: 6px; font-weight: 600;
+        }
+        .completion-badge.pass { background: rgba(74,222,128,0.15); color: var(--green); }
+        .completion-badge.fail { background: rgba(255,77,121,0.15); color: var(--pink); }
+        .scenario-item .locked-icon { font-size: 1rem; color: var(--text-muted); }
+
+        .difficulty {
+            display: inline-block; padding: 0.1rem 0.5rem; border-radius: 6px;
+            font-size: 0.65rem; font-weight: 700;
+        }
+        .difficulty.easy { background: rgba(74,222,128,0.12); color: var(--green); }
+        .difficulty.medium { background: rgba(251,146,60,0.12); color: var(--orange); }
+        .difficulty.hard { background: rgba(255,77,121,0.12); color: var(--pink); }
+
+        /* Context Card */
+        .context-card {
+            background: linear-gradient(135deg, rgba(139,92,246,0.06), rgba(34,211,238,0.04));
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius); padding: 1rem 1.15rem;
+            margin-bottom: 1rem; backdrop-filter: blur(8px);
+        }
+        .context-card .role-tag {
+            display: inline-block; padding: 0.15rem 0.55rem;
+            background: linear-gradient(135deg, rgba(139,92,246,0.2), rgba(255,77,121,0.15));
+            color: #c4b5fd; border-radius: 6px; font-size: 0.65rem; font-weight: 700;
+            margin-bottom: 0.4rem; letter-spacing: 0.02em;
+        }
+        .context-card .job-title { font-size: 1rem; font-weight: 700; margin-bottom: 0.1rem; }
+        .context-card .company-line { color: var(--text-muted); font-size: 0.75rem; margin-bottom: 0.5rem; }
+        .context-card .detail-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 0.2rem; margin-bottom: 0.5rem;
+        }
+        .context-card .detail-item { font-size: 0.7rem; display: flex; align-items: center; gap: 0.25rem; }
+        .context-card .detail-item .val { color: var(--text-muted); }
+        .context-card .tip-box {
+            background: rgba(251,146,60,0.06);
+            border: 1px solid rgba(251,146,60,0.1);
+            padding: 0.5rem 0.7rem; border-radius: var(--radius-sm);
+            font-size: 0.75rem; line-height: 1.4;
+        }
+        .context-card .tip-box .tip-label {
+            font-weight: 700; color: var(--orange); font-size: 0.6rem;
+            text-transform: uppercase; letter-spacing: 0.08em; display: block; margin-bottom: 0.1rem;
+        }
+
+        .scenario-prompt {
+            text-align: center; margin-bottom: 1rem; padding: 1.15rem;
+            background: linear-gradient(135deg, rgba(34,211,238,0.04), rgba(139,92,246,0.04));
+            border: 1px solid var(--glass-border); border-radius: var(--radius);
+        }
+        .scenario-prompt .prompt-text { font-size: 1rem; font-style: italic; line-height: 1.6; opacity: 0.9; }
+        .scenario-prompt .prompt-label {
+            font-size: 0.7rem; color: var(--text-muted); margin-bottom: 0.35rem;
+            text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600;
+        }
+
+        /* Recording */
+        #preview-container {
+            position: relative; width: 100%; max-width: 400px; margin: 1rem auto;
+            border-radius: var(--radius); overflow: hidden;
+            background: #000; aspect-ratio: 4/3;
+            box-shadow: 0 0 40px rgba(139,92,246,0.08);
+        }
+        #preview-container video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
+        #countdown-overlay {
+            position: absolute; inset: 0; display: none;
+            align-items: center; justify-content: center;
+            background: rgba(0,0,0,0.7); z-index: 10;
+        }
+        #countdown-overlay.active { display: flex; }
+        #countdown-number { font-size: 5rem; font-weight: 800; color: white; text-shadow: 0 0 60px rgba(139,92,246,0.6); }
+        .recording-indicator {
+            position: absolute; top: 0.75rem; right: 0.75rem; display: none;
+            align-items: center; gap: 0.4rem; background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(8px); padding: 0.25rem 0.65rem; border-radius: 20px; z-index: 5;
+        }
+        .recording-indicator.active { display: flex; }
+        .recording-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--pink); animation: pulse 1s infinite; }
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.2} }
+        .recording-time { font-size: 0.75rem; font-variant-numeric: tabular-nums; }
+
+        .record-btn {
+            display: block; width: 60px; height: 60px; border-radius: 50%;
+            border: none; background: linear-gradient(135deg, var(--pink), #e11d48);
+            color: white; font-size: 1.2rem; cursor: pointer; margin: 1.25rem auto;
+            transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1); font-weight: 700;
+            box-shadow: 0 4px 24px rgba(255,77,121,0.3);
+        }
+        .record-btn:hover { transform: scale(1.08); box-shadow: 0 6px 32px rgba(255,77,121,0.4); }
+        .record-btn:disabled { opacity: 0.3; cursor: not-allowed; transform: none; box-shadow: none; }
+        .record-btn.recording {
+            background: transparent; border: 3px solid var(--pink); box-shadow: 0 0 0 0 rgba(255,77,121,0.4);
+            animation: recPulse 1.5s infinite;
+        }
+        @keyframes recPulse { 0%{box-shadow:0 0 0 0 rgba(255,77,121,0.4)} 100%{box-shadow:0 0 0 16px rgba(255,77,121,0)} }
+
+        .progress-bar { width: 100%; max-width: 400px; height: 4px; background: rgba(255,255,255,0.06); border-radius: 4px; margin: 0 auto; overflow: hidden; }
+        .progress-bar .fill { height: 100%; background: linear-gradient(90deg, var(--purple), var(--pink)); width: 0%; transition: width 0.3s linear; border-radius: 4px; }
+
+        /* Loading */
+        .loading-state { text-align: center; padding: 3rem; }
+        .spinner {
+            width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.06);
+            border-top-color: var(--purple); border-radius: 50%;
+            animation: spin 0.6s linear infinite; margin: 0 auto 0.75rem;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loading-state p { color: var(--text-muted); font-size: 0.9rem; }
+
+        /* Results */
+        .results-header { text-align: center; margin-bottom: 1.25rem; }
+        .results-header h2 { font-size: 1.3rem; font-weight: 800; }
+        .results-header h2 span.pass { color: var(--green); }
+        .results-header h2 span.fail { color: var(--pink); }
+        .results-header p { color: var(--text-muted); font-size: 0.85rem; }
+        .results-header .scenario-name { color: var(--cyan); }
+
+        .result-banner {
+            text-align: center; padding: 0.75rem 1rem; border-radius: var(--radius);
+            margin-bottom: 1rem; font-weight: 700; font-size: 0.95rem; display: none;
+            backdrop-filter: blur(8px);
+        }
+        .result-banner.pass {
+            background: rgba(74,222,128,0.08); border: 1px solid rgba(74,222,128,0.2);
+            color: var(--green);
+        }
+        .result-banner.fail {
+            background: rgba(255,77,121,0.08); border: 1px solid rgba(255,77,121,0.2);
+            color: var(--pink);
+        }
+
+        .coach-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+            gap: 0.75rem; margin-bottom: 1.25rem;
+        }
+        .coach-card {
+            background: var(--glass); border: 1px solid var(--glass-border);
+            border-radius: var(--radius); padding: 1.15rem; text-align: center;
+            backdrop-filter: blur(8px);
+        }
+        .coach-card .emoji { font-size: 2rem; margin-bottom: 0.15rem; display: block; }
+        .coach-card .name { font-weight: 700; font-size: 0.95rem; margin-bottom: 0.05rem; }
+        .coach-card .focus { font-size: 0.7rem; color: var(--text-muted); margin-bottom: 0.6rem; }
+        .coach-card .score { font-size: 2.8rem; font-weight: 800; line-height: 1; }
+        .coach-card .score-label { font-size: 0.7rem; color: var(--text-muted); margin-top: 0.15rem; }
+        .coach-card.connector .score { color: var(--cyan); }
+        .coach-card.comforter .score { color: #60a5fa; }
+        .coach-card.tech-coach .score { color: #a78bfa; }
+        .coach-card.closer .score { color: var(--pink); }
+        .coach-card.igniter .score { color: var(--orange); }
+        .coach-card .metric-bar { margin-top: 0.65rem; text-align: left; }
+        .coach-card .metric-row {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 0.25rem; font-size: 0.7rem;
+        }
+        .coach-card .metric-row .label { color: var(--text-muted); }
+        .coach-card .metric-row .val { font-weight: 600; }
+        .coach-card .metric-track {
+            height: 3px; background: rgba(255,255,255,0.06); border-radius: 4px; overflow: hidden;
+            margin-bottom: 0.4rem;
+        }
+        .coach-card .metric-track .fill { height: 100%; border-radius: 4px; transition: width 1s cubic-bezier(0.34,1.56,0.64,1); }
+        .connector .metric-track .fill { background: linear-gradient(90deg, #22d3ee, #06b6d4); }
+        .comforter .metric-track .fill { background: linear-gradient(90deg, #60a5fa, #3b82f6); }
+        .tech-coach .metric-track .fill { background: linear-gradient(90deg, #a78bfa, #7c3aed); }
+        .closer .metric-track .fill { background: linear-gradient(90deg, #ff4d79, #e11d48); }
+        .igniter .metric-track .fill { background: linear-gradient(90deg, #fb923c, #f97316); }
+
+        .feedback-section { margin-bottom: 1.25rem; }
+        .feedback-section h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.6rem; display: flex; align-items: center; gap: 0.4rem; }
+        .feedback-list { list-style: none; }
+        .feedback-list li {
+            padding: 0.55rem 0.85rem; margin-bottom: 0.35rem;
+            background: var(--glass); border: 1px solid var(--glass-border);
+            border-radius: var(--radius-sm);
+            font-size: 0.85rem; line-height: 1.4; backdrop-filter: blur(4px);
+        }
+
+        .metrics-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 0.5rem; margin-bottom: 1.25rem;
+        }
+        .metric-card {
+            background: var(--glass); border: 1px solid var(--glass-border);
+            border-radius: var(--radius-sm); padding: 0.75rem; text-align: center;
+            backdrop-filter: blur(4px);
+        }
+        .metric-card .value { font-size: 1.2rem; font-weight: 700; }
+        .metric-card .label { font-size: 0.65rem; color: var(--text-muted); margin-top: 0.15rem; text-transform: uppercase; letter-spacing: 0.04em; }
+
+        .points-earned {
+            text-align: center; padding: 0.5rem; margin-bottom: 0.75rem;
+            font-size: 0.85rem; color: var(--gold); display: none;
+            background: rgba(251,191,36,0.06); border-radius: var(--radius-sm);
+            border: 1px solid rgba(251,191,36,0.1);
+        }
+        .points-earned strong { font-size: 1.1rem; }
+        .btn-group { display: flex; gap: 0.65rem; justify-content: center; flex-wrap: wrap; margin-top: 0.5rem; }
+        .btn {
+            padding: 0.6rem 1.25rem; border-radius: 12px;
+            border: 1px solid var(--glass-border); background: var(--glass);
+            color: var(--text); font-size: 0.8rem; cursor: pointer;
+            transition: all 0.2s; font-weight: 600; backdrop-filter: blur(8px);
+        }
+        .btn:hover { background: var(--surface-hover); transform: translateY(-1px); }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--purple), #7c3aed); border-color: transparent;
+            color: white; box-shadow: 0 4px 16px rgba(139,92,246,0.25);
+        }
+        .btn-primary:hover { box-shadow: 0 6px 24px rgba(139,92,246,0.35); opacity: 1; }
+        .btn-success {
+            background: linear-gradient(135deg, var(--green), #22c55e); border-color: transparent;
+            color: #000; box-shadow: 0 4px 16px rgba(74,222,128,0.25);
+        }
+
+        .transcript-box {
+            background: var(--glass); border: 1px solid var(--glass-border);
+            border-radius: var(--radius-sm); padding: 0.75rem; margin-bottom: 1.25rem;
+            font-size: 0.8rem; line-height: 1.5; max-height: 150px; overflow-y: auto;
+            backdrop-filter: blur(4px);
+        }
+        .transcript-box .label {
+            font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase;
+            letter-spacing: 0.06em; margin-bottom: 0.35rem; font-weight: 600;
+        }
+
+        /* Leaderboard */
+        .lb-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
+        .lb-header h2 { font-size: 1.15rem; font-weight: 800; }
+        .lb-grid { display: grid; gap: 0.45rem; }
+        .lb-row {
+            display: flex; align-items: center; gap: 0.65rem;
+            background: var(--glass); border: 1px solid var(--glass-border);
+            border-radius: var(--radius-sm); padding: 0.65rem 0.85rem;
+            backdrop-filter: blur(4px);
+        }
+        .lb-row .pos { font-weight: 800; font-size: 0.85rem; min-width: 1.5rem; }
+        .lb-row .pos.top1 { color: var(--gold); }
+        .lb-row .pos.top2 { color: #94a3b8; }
+        .lb-row .pos.top3 { color: #cd7f32; }
+        .lb-row .info { flex: 1; }
+        .lb-row .info .sc-title { font-size: 0.8rem; font-weight: 600; }
+        .lb-row .info .sc-meta { font-size: 0.65rem; color: var(--text-muted); }
+        .lb-row .lb-score { font-weight: 700; font-size: 0.95rem; min-width: 2.2rem; text-align: right; }
+        .lb-row .lb-pts { color: var(--gold); font-size: 0.7rem; min-width: 2.8rem; text-align: right; }
+
+        .toast {
+            position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%);
+            background: rgba(20,20,30,0.95); border: 1px solid var(--glass-border);
+            backdrop-filter: blur(16px); padding: 0.6rem 1.2rem; border-radius: 14px;
+            font-size: 0.8rem; z-index: 100; display: none;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+        }
+        .toast.show { display: block; animation: slideUp 0.3s cubic-bezier(0.34,1.56,0.64,1); }
+        @keyframes slideUp { from { opacity:0; transform:translateX(-50%) translateY(16px); } to { opacity:1; transform:translateX(-50%) translateY(0); } }
+        .empty-state { text-align: center; padding: 2.5rem; color: var(--text-muted); }
+        .empty-state .big-icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+
+        @media (max-width: 600px) {
+            .container { padding: 1rem; }
+            .category-grid { grid-template-columns: 1fr 1fr; }
+            .coach-grid { grid-template-columns: 1fr; }
+            .coach-card .score { font-size: 2.2rem; }
+            header { padding: 0.7rem 1rem; }
+            header h1 { font-size: 0.95rem; }
+            .player-stats .level-badge { font-size: 0.6rem; padding: 0.15rem 0.5rem; }
+            .player-stats .pts { font-size: 0.7rem; }
+            .progress-section { padding: 1rem 1.15rem; }
+        }
+    </style>
+</head>
+<body>
+<header>
+    <button class="back-btn" id="backBtn" onclick="goBack()">←</button>
+    <h1>🎤 Confidence Coach</h1>
+    <div class="player-stats">
+        <span class="level-badge" id="levelBadge">Lv.1</span>
+        <span class="pts" id="ptsDisplay">🏆 0</span>
+        <span id="tierDisplay" style="font-size:0.7rem;">
+            <span class="tier-dot easy"></span><span class="tier-dot medium locked"></span><span class="tier-dot hard locked"></span>
+        </span>
+    </div>
+</header>
+<div class="container">
+
+<!-- View: Home -->
+<div class="view active" id="view-home">
+    <div class="progress-section">
+        <h3>📈 Your Progress</h3>
+        <div class="tier-bar" id="tierBar"></div>
+        <div class="tier-labels">
+            <span>🟢 Easy <span id="easyCount">0/0</span></span>
+            <span>🟡 Medium <span id="medCount">0/0</span></span>
+            <span>🔴 Hard <span id="hardCount">0/0</span></span>
+        </div>
+    </div>
+    <h2 style="font-size:1.05rem; margin-bottom:0.1rem;">Choose a Scenario</h2>
+    <p style="color:var(--text-muted); font-size:0.8rem; margin-bottom:0.75rem;">
+        Complete all Easy to unlock Medium, all Medium to unlock Hard.
+    </p>
+    <div class="btn-group" style="margin-bottom:1rem;">
+        <button class="btn btn-primary" onclick="showViewOnly('view-leaderboard'); renderLeaderboard();">🏆 Leaderboard</button>
+    </div>
+    <div class="category-grid" id="categoryGrid"></div>
+</div>
+
+<!-- View: Scenarios -->
+<div class="view" id="view-scenarios">
+    <h2 id="categoryTitle" style="font-size:1.05rem;">Scenarios</h2>
+    <div class="scenario-list" id="scenarioList"></div>
+</div>
+
+<!-- View: Recording -->
+<div class="view" id="view-recording">
+    <div id="customScenarioSection" style="margin-bottom:0.75rem;">
+        <button class="btn" onclick="toggleCustomScenario()" id="customToggleBtn" style="width:100%;display:flex;align-items:center;justify-content:center;gap:0.4rem;font-size:0.8rem;">
+            ✏️ Customize Scenario
+        </button>
+        <div id="customScenarioPanel" style="display:none;margin-top:0.5rem;background:var(--glass);border:1px solid var(--glass-border);border-radius:var(--radius);padding:0.85rem 1rem;backdrop-filter:blur(8px);">
+            <div style="font-size:0.8rem;font-weight:600;margin-bottom:0.5rem;color:var(--cyan);">🎯 Custom Scenario Details</div>
+            <div style="margin-bottom:0.5rem;">
+                <label style="font-size:0.7rem;color:var(--text-muted);display:block;margin-bottom:0.25rem;">📄 Job listing URL (auto-fills details)</label>
+                <div style="display:flex;gap:0.4rem;">
+                    <input type="url" id="jobUrlInput" placeholder="https://www.linkedin.com/jobs/..." style="flex:1;background:rgba(255,255,255,0.06);border:1px solid var(--glass-border);border-radius:8px;padding:0.45rem 0.65rem;color:var(--text);font-size:0.8rem;outline:none;">
+                    <button class="btn" onclick="parseJobUrl()" id="parseUrlBtn" style="white-space:nowrap;font-size:0.75rem;padding:0.4rem 0.8rem;">🔍 Parse</button>
+                </div>
+                <div id="parseStatus" style="font-size:0.7rem;color:var(--text-muted);margin-top:0.2rem;"></div>
+            </div>
+            <div style="margin-bottom:0.5rem;">
+                <label style="font-size:0.7rem;color:var(--text-muted);display:block;margin-bottom:0.25rem;">✍️ Or describe the scenario yourself</label>
+                <textarea id="customScenarioDesc" placeholder="Who are you talking to? What's the role? What's the context? What are you discussing?" rows="3" style="width:100%;background:rgba(255,255,255,0.06);border:1px solid var(--glass-border);border-radius:8px;padding:0.5rem 0.65rem;color:var(--text);font-size:0.8rem;resize:vertical;outline:none;font-family:inherit;line-height:1.4;"></textarea>
+            </div>
+            <div style="display:flex;gap:0.4rem;">
+                <button class="btn btn-success" onclick="applyCustomScenario()" style="flex:1;font-size:0.8rem;">✅ Apply Custom Context</button>
+                <button class="btn" onclick="resetCustomScenario()" style="font-size:0.75rem;">↩ Reset</button>
+            </div>
+        </div>
+    </div>
+    <div class="context-card" id="contextCard" style="display:none;">
+        <div class="role-tag" id="ctxRoleTag">Role</div>
+        <div class="job-title" id="ctxJobTitle">Job Title</div>
+        <div class="company-line" id="ctxCompany">Company</div>
+        <div class="detail-grid">
+            <div class="detail-item">💰 <span class="val" id="ctxSalary">—</span></div>
+            <div class="detail-item">⏱ <span class="val" id="ctxDuration">—</span></div>
+            <div class="detail-item">🎯 Pass: <span class="val" id="ctxPassScore">7.0</span></div>
+            <div class="detail-item">⭐ Points: <span class="val" id="ctxPoints">100</span></div>
+        </div>
+        <div class="tip-box">
+            <span class="tip-label">💡 Coach's Tip</span>
+            <span id="ctxTip">Give it your best shot.</span>
+        </div>
+    </div>
+    <div class="scenario-prompt">
+        <div class="prompt-label">Your Scenario</div>
+        <div class="prompt-text" id="promptText">Loading...</div>
+    </div>
+    <div id="preview-container">
+        <video id="videoPreview" autoplay playsinline muted></video>
+        <div id="countdown-overlay"><div id="countdown-number">3</div></div>
+        <div class="recording-indicator" id="recordingIndicator">
+            <div class="recording-dot"></div>
+            <span class="recording-time" id="recordingTime">0:00</span>
+        </div>
+    </div>
+    <div class="progress-bar"><div class="fill" id="progressFill"></div></div>
+    <button class="record-btn" id="recordBtn" onclick="toggleRecording()">🎤</button>
+    <p style="text-align:center;color:var(--text-muted);font-size:0.8rem;" id="recordHint">Press to start</p>
+</div>
+
+<!-- View: Photo Capture (Dress mode) -->
+<div class="view" id="view-photo">
+    <div class="context-card" id="photoContextCard" style="display:none;">
+        <div class="role-tag" id="photoRoleTag">Role</div>
+        <div class="job-title" id="photoJobTitle">Scenario</div>
+        <div class="company-line" id="photoCompany">—</div>
+        <div class="detail-grid">
+            <div class="detail-item">📍 <span class="val" id="photoSetting">—</span></div>
+            <div class="detail-item">👔 <span class="val" id="photoFormality">—</span></div>
+        </div>
+        <div class="tip-box">
+            <span class="tip-label">💡 Stylist's Tip</span>
+            <span id="photoTip">Stand in good light, full-body visible.</span>
+        </div>
+    </div>
+    <div id="photo-preview-container" style="position:relative;width:100%;max-width:360px;margin:0.75rem auto;border-radius:var(--radius);overflow:hidden;background:#000;aspect-ratio:3/4;">
+        <video id="photoVideo" autoplay playsinline muted style="width:100%;height:100%;object-fit:cover;transform:scaleX(-1);"></video>
+        <div id="photo-countdown" style="position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.7);z-index:10;">
+            <div style="font-size:4rem;font-weight:800;color:white;text-shadow:0 0 40px rgba(139,92,246,0.6);" id="photoCountNum">3</div>
+        </div>
+    </div>
+    <button class="record-btn" id="captureBtn" onclick="capturePhoto()" style="background:linear-gradient(135deg,var(--purple),var(--cyan));box-shadow:0 4px 24px rgba(34,211,238,0.3);">📸</button>
+    <p style="text-align:center;color:var(--text-muted);font-size:0.8rem;" id="captureHint">Position yourself and tap to capture</p>
+    <div class="btn-group" style="margin-top:0.5rem;">
+        <button class="btn" onclick="goBack()">← Back</button>
+    </div>
+</div>
+
+<!-- View: Loading -->
+<div class="view" id="view-loading">
+    <div class="loading-state">
+        <div class="spinner"></div>
+        <h3>Analyzing...</h3>
+        <p id="analysisStatus">Transcribing audio</p>
+    </div>
+</div>
+
+<!-- View: Results -->
+<div class="view" id="view-results">
+    <div class="result-banner" id="resultBanner" style="display:none;"></div>
+    <div class="points-earned" id="pointsEarned" style="display:none;"></div>
+    <div class="results-header">
+        <h2>Your Results</h2>
+        <p>Scenario: <span class="scenario-name" id="resultScenario">—</span></p>
+    </div>
+    <div class="coach-grid" id="coachGrid"></div>
+    <div class="feedback-section">
+        <h3>💡 Tips to Improve</h3>
+        <ul class="feedback-list" id="feedbackList"></ul>
+    </div>
+    <h3 style="margin-bottom:0.6rem;font-size:0.95rem;">📊 Speaking Stats</h3>
+    <div class="metrics-grid" id="metricsGrid"></div>
+    <h3 style="margin-bottom:0.6rem;font-size:0.95rem;">📝 Transcript</h3>
+    <div class="transcript-box">
+        <div class="label">What the coach heard</div>
+        <div id="transcriptText">—</div>
+    </div>
+    <div class="btn-group">
+        <button class="btn" onclick="retryLast()">🔄 Try Again</button>
+        <button class="btn btn-primary" onclick="pickNewScenario()">🎯 Next</button>
+    </div>
+</div>
+
+<!-- View: Outfit Results -->
+<div class="view" id="view-outfit-results">
+    <div class="results-header">
+        <h2>👔 Style Review</h2>
+        <p>Scenario: <span class="scenario-name" id="outfitScenarioName">—</span></p>
+    </div>
+    <div id="outfitOverall" style="text-align:center;margin-bottom:1rem;">
+        <div style="font-size:3.5rem;font-weight:800;" id="outfitScore">—</div>
+        <div style="font-size:0.8rem;color:var(--text-muted);">/ 10 · Overall</div>
+        <div style="margin-top:0.5rem;display:inline-block;padding:0.3rem 1rem;border-radius:20px;font-weight:700;font-size:0.85rem;" id="outfitVerdict">—</div>
+    </div>
+    <div id="outfitTopTip" style="background:linear-gradient(135deg,rgba(251,191,36,0.08),rgba(251,146,60,0.06));border:1px solid rgba(251,191,36,0.15);border-radius:var(--radius);padding:0.85rem 1rem;margin-bottom:1.25rem;">
+        <div style="font-size:0.7rem;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:0.25rem;">⭐ Top Tip</div>
+        <div id="outfitTopTipText" style="font-size:0.9rem;line-height:1.5;">—</div>
+    </div>
+    <div class="coach-grid" id="outfitMetricsGrid" style="grid-template-columns:1fr 1fr;">
+        <div class="coach-card" id="outfitFacialHairCard">
+            <div style="font-size:1.8rem;margin-bottom:0.15rem;">🧔</div>
+            <div class="name" style="font-size:0.85rem;">Facial Hair</div>
+            <div class="score" style="font-size:2.5rem;color:var(--cyan);" id="outfitFacialScore">—</div>
+            <div style="font-size:0.75rem;color:var(--text-muted);margin-top:0.3rem;" id="outfitFacialFeedback">—</div>
+        </div>
+        <div class="coach-card" id="outfitClothingCard">
+            <div style="font-size:1.8rem;margin-bottom:0.15rem;">👕</div>
+            <div class="name" style="font-size:0.85rem;">Clothing</div>
+            <div class="score" style="font-size:2.5rem;color:var(--pink);" id="outfitClothingScore">—</div>
+            <div style="font-size:0.75rem;color:var(--text-muted);margin-top:0.3rem;" id="outfitClothingFeedback">—</div>
+        </div>
+    </div>
+    <div class="coach-card" style="margin-bottom:1.25rem;">
+        <div style="font-size:1.5rem;margin-bottom:0.15rem;">💇</div>
+        <div class="name" style="font-size:0.85rem;">Overall Grooming</div>
+        <div class="score" style="font-size:2.5rem;color:var(--orange);" id="outfitGroomingScore">—</div>
+        <div style="font-size:0.75rem;color:var(--text-muted);margin-top:0.3rem;" id="outfitGroomingFeedback">—</div>
+    </div>
+    <div class="btn-group">
+        <button class="btn" onclick="retakePhoto()">📸 Retake</button>
+        <button class="btn btn-primary" onclick="pickNewScenario()">🎯 New Scenario</button>
+    </div>
+</div>
+
+<!-- View: Leaderboard -->
+<div class="view" id="view-leaderboard">
+    <div class="lb-header">
+        <h2>🏆 Leaderboard</h2>
+        <span style="font-size:0.8rem;color:var(--text-muted);" id="lbTotalPts">0 total pts</span>
+    </div>
+    <div class="lb-grid" id="lbGrid"></div>
+    <div class="btn-group" style="margin-top:1rem;">
+        <button class="btn" onclick="showViewOnly('view-home')">← Back</button>
+        <button class="btn" onclick="if(confirm('Reset all progress?')){localStorage.removeItem('coachGame');refreshGameState();showViewOnly('view-home');showToast('Progress reset');}">🔄 Reset</button>
+    </div>
+</div>
+
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// GAME STATE
+// ═══════════════════════════════════════════════════════════════
+
+const PASS_THRESHOLDS = { easy: 7.0, medium: 8.0, hard: 8.5 };
+const POINT_MULTIPLIERS = { easy: 10, medium: 15, hard: 25 };
+const TIER_ORDER = ['easy', 'medium', 'hard'];
+
+function defaultGameState() {
+    return {
+        completed: {},       // { scenarioId: { bestScore, points, totalAttempts, bestTranscript } }
+        totalPoints: 0,
+        _version: 1
+    };
+}
+
+function loadGameState() {
+    try {
+        const raw = localStorage.getItem('coachGame');
+        if (raw) {
+            const state = JSON.parse(raw);
+            if (state._version === 1) return state;
+        }
+    } catch(e) {}
+    const def = defaultGameState();
+    saveGameState(def);
+    return def;
+}
+
+function saveGameState(state) {
+    localStorage.setItem('coachGame', JSON.stringify(state));
+}
+
+let gameState = loadGameState();
+
+function getTierUnlock(difficulty) {
+    const idx = TIER_ORDER.indexOf(difficulty);
+    if (idx <= 0) return true; // easy always unlocked
+    // Must complete ALL scenarios of previous tier with pass
+    const prevTier = TIER_ORDER[idx - 1];
+    const allScenarios = getAllScenarios();
+    const prevOfTier = allScenarios.filter(s => s.difficulty === prevTier);
+    return prevOfTier.every(s => {
+        const c = gameState.completed[s.id];
+        return c && c.bestScore >= PASS_THRESHOLDS[prevTier];
+    });
+}
+
+function getAllScenarios() {
+    if (!scenariosData) return [];
+    const all = [];
+    scenariosData.categories.forEach(cat => {
+        cat.scenarios.forEach(s => {
+            all.push({ ...s, categoryId: cat.id, categoryName: cat.name });
+        });
+    });
+    return all;
+}
+
+function getScenarioCompletion(scenarioId) {
+    return gameState.completed[scenarioId] || null;
+}
+
+function getTierStats(difficulty) {
+    const all = getAllScenarios().filter(s => s.difficulty === difficulty);
+    const completed = all.filter(s => {
+        const c = gameState.completed[s.id];
+        return c && c.bestScore >= PASS_THRESHOLDS[difficulty];
+    });
+    return { total: all.length, done: completed.length };
+}
+
+function updatePlayerStats() {
+    document.getElementById('ptsDisplay').textContent = '🏆 ' + gameState.totalPoints;
+    // Calculate level
+    const level = Math.floor(gameState.totalPoints / 200) + 1;
+    document.getElementById('levelBadge').textContent = 'Lv.' + level;
+
+    // Tier dots
+    const tiers = ['easy', 'medium', 'hard'];
+    let html = '';
+    tiers.forEach(t => {
+        const unlocked = getTierUnlock(t);
+        const cls = unlocked ? t : 'locked';
+        html += `<span class="tier-dot ${cls}"></span>`;
+    });
+    document.getElementById('tierDisplay').innerHTML = html;
+
+    // Progress bar
+    const bar = document.getElementById('tierBar');
+    bar.innerHTML = '';
+    tiers.forEach(t => {
+        const stats = getTierStats(t);
+        const pct = stats.total > 0 ? (stats.done / stats.total) * 100 : 0;
+        const unlocked = getTierUnlock(t);
+        const seg = document.createElement('div');
+        seg.className = `seg ${unlocked ? t : 'locked'}`;
+        seg.style.width = (100 / 3) + '%';
+        bar.appendChild(seg);
+        // Inner fill
+        const fill = document.createElement('div');
+        fill.style.height = '100%';
+        fill.style.width = pct + '%';
+        fill.style.background = unlocked
+            ? (t === 'easy' ? 'var(--success)' : t === 'medium' ? 'var(--accent-igniter)' : 'var(--accent-closer)')
+            : 'var(--surface-hover)';
+        fill.style.transition = 'width 0.5s';
+        seg.appendChild(fill);
+    });
+
+    document.getElementById('easyCount').textContent = getTierStats('easy').done + '/' + getTierStats('easy').total;
+    document.getElementById('medCount').textContent = getTierStats('medium').done + '/' + getTierStats('medium').total;
+    document.getElementById('hardCount').textContent = getTierStats('hard').done + '/' + getTierStats('hard').total;
+
+    document.getElementById('lbTotalPts').textContent = gameState.totalPoints + ' total pts';
+}
+
+function refreshGameState() {
+    gameState = loadGameState();
+    updatePlayerStats();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════════
+
+let scenariosData = null;
+let currentCategory = null;
+let currentScenario = null;
+let mediaStream = null;
+let mediaRecorder = null;
+let recordedChunks = [];
+let isRecording = false;
+let recordingTimer = null;
+let recordingSeconds = 0;
+let maxDuration = 120;
+let lastResults = null;
+
+const API_BASE = window.location.origin;
+
+document.addEventListener('DOMContentLoaded', () => { loadScenarios(); refreshGameState(); });
+
+// ═══════════════════════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════════════════════
+
+function showView(id) {
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    const hideBack = ['view-home', 'view-leaderboard'].includes(id);
+    document.getElementById('backBtn').style.display = hideBack ? 'none' : 'block';
+    refreshGameState();
+}
+
+function showViewOnly(id) {
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    document.getElementById('backBtn').style.display = (id === 'view-home' || id === 'view-leaderboard') ? 'none' : 'block';
+}
+
+function goBack() {
+    if (isRecording) stopRecording();
+    cleanupMedia();
+    if (document.getElementById('view-scenarios').classList.contains('active')) { showView('view-home'); }
+    else if (document.getElementById('view-recording').classList.contains('active')) { showView('view-scenarios'); }
+    else if (document.getElementById('view-results').classList.contains('active')) { showView('view-home'); }
+    else if (document.getElementById('view-leaderboard').classList.contains('active')) { showView('view-home'); }
+    else { showView('view-home'); }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SCENARIOS
+// ═══════════════════════════════════════════════════════════════
+
+async function loadScenarios() {
+    try {
+        const resp = await fetch(API_BASE + '/api/scenarios');
+        scenariosData = await resp.json();
+        renderCategories();
+    } catch (e) {
+        scenariosData = {"categories":[
+            {"id":"job-interviews","name":"Job Interviews","icon":"💼","scenarios":[
+                {"id":"tell-me-about-yourself","title":"Tell Me About Yourself","prompt":"Walk me through your background. Who are you professionally?","max_duration":120,"difficulty":"easy","context":{"role":"IT Infrastructure Engineer","company":"Principality Building Society","salary":"£38k-£48k/yr","location":"Cardiff (Hybrid)","interviewer_tip":"Emphasise migrations you've led. They want BAU + project work."}},
+                {"id":"why-this-role","title":"Why This Role?","prompt":"Network Engineer role at an IT services company. Why this role?","max_duration":90,"difficulty":"medium","context":{"role":"Network Engineer","company":"Stefanini UK Ltd","salary":"£28k-£32k/yr","location":"Bridgend","interviewer_tip":"Honest about wanting to grow. Don't badmouth current employer."}},
+                {"id":"biggest-weakness","title":"Biggest Weakness?","prompt":"What's your biggest weakness and what are you doing about it?","max_duration":90,"difficulty":"hard","context":{"role":"2nd Line IT Support","company":"Admiral Group","salary":"£32k-£38k/yr","location":"Cardiff (Hybrid)","interviewer_tip":"Real weakness + concrete improvement plan."}},
+                {"id":"describe-conflict","title":"A Difficult Situation","prompt":"Tell me about a time you handled a difficult situation. Use STAR.","max_duration":120,"difficulty":"medium","context":{"role":"NOC Engineer","company":"Indigo Telecom","salary":"£28k-£38k/yr","location":"Remote","interviewer_tip":"STAR: Situation, Task, Action, Result. Quantify."}},
+                {"id":"where-see-yourself","title":"Where in 5 Years?","prompt":"Where do you see yourself in 5 years?","max_duration":90,"difficulty":"medium","context":{"role":"Junior DevOps Engineer","company":"Companies House","salary":"£35,952-£37,970/yr","location":"Cardiff (Hybrid)","interviewer_tip":"Ambition tied to the role."}},
+                {"id":"why-should-we-hire","title":"Why Hire You?","prompt":"Other candidates are qualified. Why you?","max_duration":90,"difficulty":"hard","context":{"role":"Junior Security Analyst","company":"Bridewell","salary":"£28k-£35k/yr","location":"Cardiff (Hybrid)","interviewer_tip":"Certs + field experience = rare combo."}},
+                {"id":"time-you-led","title":"Describe a Project You Led","prompt":"Tell me about a time you took the lead on a project.","max_duration":120,"difficulty":"medium","context":{"role":"IT Project Engineer","company":"Ever Nimble","salary":"£30k-£36k/yr","location":"Cardiff (Hybrid)","interviewer_tip":"DECT-to-HHT migrations count. Talk planning, coordination, execution."}},
+                {"id":"handle-pressure","title":"How Do You Handle Pressure?","prompt":"This role has tight SLAs. How do you keep a clear head under pressure?","max_duration":90,"difficulty":"medium","context":{"role":"1st Line Support","company":"NHS Wales Shared Services","salary":"£24k-£27k/yr","location":"Cardiff","interviewer_tip":"Give a real example — site down, deadline looming, manager pushing."}},
+                {"id":"tech-skills-overview","title":"Walk Us Through Your Tech Stack","prompt":"What technologies do you work with daily? How proficient are you?","max_duration":120,"difficulty":"easy","context":{"role":"Desktop Support L2","company":"PCI Pharma Services","salary":"£28k-£35k/yr","location":"Cardiff","interviewer_tip":"VoIP, DECT, HHT, networking, CCNA, AD, ticketing systems."}},
+                {"id":"why-gap-or-change","title":"Why the Career Shift?","prompt":"Your background is VoIP field engineering. Why a network-focused role now?","max_duration":90,"difficulty":"hard","context":{"role":"Network Engineer","company":"Bridgend CBC","salary":"£34k-£36.4k/yr","location":"Bridgend (Hybrid)","interviewer_tip":"Frame it as natural progression. VoIP is built on networking."}}
+            ]},
+            {"id":"sales-calls","name":"Sales Calls","icon":"📞","scenarios":[
+                {"id":"pitch-product","title":"Pitch a VoIP System","prompt":"Sell hosted VoIP to a 200-store chain on aging ISDN.","max_duration":60,"difficulty":"medium","context":{"role":"VoIP Engineer","company":"Wildix Partner","vibe":"Central mgmt, cost savings, ISDN switch-off."}},
+                {"id":"objection-price","title":"Price Objection","prompt":"Customer: 'Your VoIP is too expensive.' Convince them.","max_duration":90,"difficulty":"hard","context":{"role":"VoIP Engineer","company":"ETS Connect","vibe":"ISDN switch-off, maintenance costs, flexibility."}},
+                {"id":"objection-happy","title":"Happy With Current Provider","prompt":"Prospect: 'Happy with BT, been with them 10 years.'","max_duration":90,"difficulty":"hard","context":{"role":"VoIP Engineer","company":"Wildix Partner","vibe":"BT expensive, slow support. Better SLAs."}},
+                {"id":"objection-too-small","title":"Too Small for Hosted VoIP?","prompt":"'We're only 10 people. Hosted VoIP sounds like overkill.'","max_duration":90,"difficulty":"medium","context":{"role":"VoIP Engineer","company":"Wildix Partner","vibe":"Scales down too — simpler setup, lower upfront cost."}},
+                {"id":"objection-security","title":"Security Concerns","prompt":"IT manager: 'I don't want phones on the internet. Too risky.'","max_duration":90,"difficulty":"hard","context":{"role":"VoIP Engineer","company":"ETS Connect","vibe":"Encryption, VLANs, SBCs. Often more secure than old on-prem kit."}},
+                {"id":"upsell-existing","title":"Upsell Add-On Features","prompt":"Customer already has basic VoIP. Pitch call recording + mobile app.","max_duration":60,"difficulty":"easy","context":{"role":"Account Manager","company":"Wildix Partner","vibe":"Frame as 'your team wants these features — here's how easy.'"}},
+                {"id":"cold-call-decision-maker","title":"Cold Call — IT Director","prompt":"30 seconds to earn more time from an IT director at a 150-person firm.","max_duration":45,"difficulty":"hard","context":{"role":"BDM","company":"ETS Connect","vibe":"'Most IT directors are frustrated with their phone bill. You?'"}},
+                {"id":"objection-already-upgraded","title":"We Already Upgraded","prompt":"'We spent £15k on a new system last year. Not changing.'","max_duration":90,"difficulty":"hard","context":{"role":"VoIP Engineer","company":"Wildix Partner","vibe":"Acknowledge investment. Ask about support costs and what they're missing."}},
+                {"id":"competitor-objection","title":"Competitor Is Cheaper","prompt":"'Competitor is 30% cheaper. Match it or we walk.'","max_duration":90,"difficulty":"hard","context":{"role":"VoIP Engineer","company":"ETS Connect","vibe":"Compare what's included — SLAs, features, reliability."}},
+                {"id":"implementation-anxiety","title":"Implementation Seems Painful","prompt":"'Switching sounds like a nightmare. We're 24/7.'","max_duration":90,"difficulty":"medium","context":{"role":"VoIP Engineer","company":"ETS Connect","vibe":"Phased rollout, parallel running, weekend cutovers. You've done this."}}
+            ]},
+            {"id":"difficult-convos","name":"Difficult Conversations","icon":"😬","scenarios":[
+                {"id":"delayed-project","title":"Delayed Rollout","prompt":"2 weeks behind on 200-handset rollout. Reset expectations.","max_duration":90,"difficulty":"hard","context":{"role":"Field Engineer","company":"ETS Connect","vibe":"Own it, explain blocker, realistic timeline."}},
+                {"id":"coworker-conflict","title":"Teammate Not Pulling Weight","prompt":"Partner keeps disappearing. Address it.","max_duration":90,"difficulty":"hard","context":{"role":"Field Engineer","company":"ETS Connect","vibe":"Assume good intent first."}},
+                {"id":"saying-no","title":"Too Many Sites","prompt":"3 more sites added to a full week. Push back.","max_duration":90,"difficulty":"hard","context":{"role":"Field Engineer","company":"ETS Connect","vibe":"'I can do X and Y, Z slips. What's priority?'"}},
+                {"id":"client-refuses-pay","title":"Client Refuses to Pay","prompt":"Client won't sign off, claiming handsets 'don't sound right.' You know config is correct.","max_duration":90,"difficulty":"hard","context":{"role":"Field Engineer","company":"ETS Connect","vibe":"Don't get defensive. Investigate together. Find compromise."}},
+                {"id":"mistake-on-site","title":"You Made a Mistake","prompt":"Configured wrong extension range. Half the users can't call out. Call the manager.","max_duration":90,"difficulty":"medium","context":{"role":"Field Engineer","company":"ETS Connect","vibe":"Own it immediately. Apologise, explain fix, give precise ETA."}},
+                {"id":"unhappy-customer","title":"Customer Unhappy With Service","prompt":"Store manager furious — handsets down 3 hours, ticket still unassigned.","max_duration":90,"difficulty":"hard","context":{"role":"Field Engineer","company":"ETS Connect","vibe":"Let them vent. Take ownership even if it's not your fault."}},
+                {"id":"bad-feedback-to-colleague","title":"Giving Tough Feedback","prompt":"Junior engineer keeps rushing configs and making mistakes you fix. Address it.","max_duration":90,"difficulty":"medium","context":{"role":"Senior FE","company":"ETS Connect","vibe":"Criticise behaviour, not person. 'Let's go through them together.'"}},
+                {"id":"asking-for-raise","title":"Asking for a Raise","prompt":"18 months in, more responsibility, new hires on higher rate. Ask for a raise.","max_duration":90,"difficulty":"hard","context":{"role":"VoIP Engineer","company":"ETS Connect","vibe":"Come with evidence — projects done, certs earned, market data."}},
+                {"id":"handing-in-notice","title":"Handing in Your Notice","prompt":"Better offer elsewhere. Resign professionally without burning bridges.","max_duration":90,"difficulty":"medium","context":{"role":"Field Engineer","company":"ETS Connect","vibe":"Grateful, firm, offer transition help."}},
+                {"id":"admitting-you-dont-know","title":"You Don't Know the Answer","prompt":"Client asks a technical question you genuinely don't know. Handle it.","max_duration":60,"difficulty":"easy","context":{"role":"Field Engineer","company":"ETS Connect","vibe":"'Great question — let me check with our specialist and get back to you.'"}}
+            ]},
+            {"id":"presentations","name":"Presentations","icon":"🎤","scenarios":[
+                {"id":"introduce-yourself","title":"Network Team Meeting","prompt":"New on a team call. Introduce yourself memorably.","max_duration":60,"difficulty":"easy","context":{"role":"Network Engineer","company":"Principality BS","vibe":"Warm and professional."}},
+                {"id":"explain-tech","title":"Explain VoIP to a Store Manager","prompt":"Non-techy manager. Why are their phones being replaced?","max_duration":90,"difficulty":"medium","context":{"role":"Field Engineer","company":"ETS Connect","vibe":"No jargon. 'Old system turning off, new one over internet.'"}},
+                {"id":"leadership-update","title":"Project Update to Leadership","prompt":"150 handsets across 30 sites deployed so far. Update head of IT + ops director.","max_duration":120,"difficulty":"hard","context":{"role":"Project Engineer","company":"ETS Connect","vibe":"Progress, blockers, next steps. No technical detail."}},
+                {"id":"train-new-starters","title":"Train New Field Engineers","prompt":"3 new starters next week. Give 2-min overview of deployment process.","max_duration":120,"difficulty":"medium","context":{"role":"Senior FE","company":"ETS Connect","vibe":"Survey -> config -> deploy -> test -> sign-off. Add pitfalls."}},
+                {"id":"post-outage-review","title":"Explain an Outage to Management","prompt":"4-hour network outage across 50 sites. Explain to non-tech leadership.","max_duration":120,"difficulty":"hard","context":{"role":"Network Engineer","company":"ETS Connect","vibe":"'Router failed. Backup config had error. Both fixed.' No jargon."}},
+                {"id":"ccna-progress","title":"CCNA Study Presentation","prompt":"Present what you learned this week. Pick routing, switching, OSPF or STP.","max_duration":120,"difficulty":"medium","context":{"role":"CCNA Student","company":"Self-study","vibe":"Use an analogy. 'This is what I learned, where I got stuck, how it applies.'"}},
+                {"id":"sales-presentation","title":"Sales Presentation to Board","prompt":"Pitch hosted VoIP to 3 decision-makers. 2 minutes, one shot.","max_duration":120,"difficulty":"hard","context":{"role":"Solutions Engineer","company":"Wildix Partner","vibe":"Start with their pain. End with ROI. You are the presentation."}},
+                {"id":"team-retro","title":"Team Retrospective","prompt":"One thing that went well, one that didn't, one to change next quarter.","max_duration":90,"difficulty":"easy","context":{"role":"Field Engineer","company":"ETS Connect","vibe":"Honest but constructive. Suggest a pre-site checklist."}},
+                {"id":"business-case","title":"Business Case — £5k Equipment","prompt":"Convince your manager to approve £5k for new test gear. 2 minutes.","max_duration":120,"difficulty":"medium","context":{"role":"Field Engineer","company":"ETS Connect","vibe":"'Pays for itself in 3 months by reducing site revisits.'"}},
+                {"id":"lightning-talk","title":"Lightning Talk — VoIP at Scale","prompt":"Tech meetup talk: 'Lessons from Deploying VoIP at Scale.' Condense to 2 min.","max_duration":120,"difficulty":"hard","context":{"role":"VoIP Engineer","company":"ETS Connect","vibe":"3 lessons. Start with your biggest mistake. End with the takeaway."}}
+            ]},
+            {"id":"dress-presentation","name":"Dress & Presentation","icon":"👔","scenarios":[
+                {"id":"dress-interview","title":"Job Interview Outfit","prompt":"Network Engineer interview. Take a full-body photo of your planned outfit.","max_duration":15,"difficulty":"easy","context":{"role":"Network Engineer","company":"Stefanini / Principality","setting":"In-person interview","formality":"Smart casual","tip":"Collared shirt + smart trousers + clean shoes. No tie needed for IT."}},
+                {"id":"dress-client-meeting","title":"Client Site Meeting","prompt":"Visiting a retail client for a 200-handset deployment. Show your site outfit.","max_duration":15,"difficulty":"easy","context":{"role":"Field Engineer","company":"ETS Connect","setting":"Client site","formality":"Smart casual + practical","tip":"Polo, dark jeans or chinos, sturdy shoes. Professional but ladder-ready."}},
+                {"id":"dress-conference","title":"Tech Conference","prompt":"Attending a tech conference or meetup. Show your networking outfit.","max_duration":15,"difficulty":"easy","context":{"role":"VoIP Engineer","company":"Self","setting":"Conference","formality":"Smart casual + personality","tip":"Branded hoodie, smart jacket, interesting trainers — conversation starters."}},
+                {"id":"dress-first-day","title":"First Day at New Job","prompt":"First day at an IT Infrastructure role. Make a good impression.","max_duration":15,"difficulty":"easy","context":{"role":"IT Infrastructure Engineer","company":"Principality BS","setting":"First day","formality":"Smart casual +1","tip":"Button-down, chinos, clean trainers. Better to overdress day one."}},
+                {"id":"dress-sales-pitch","title":"Boardroom Sales Pitch","prompt":"Presenting a VoIP proposal to 3 decision-makers. What are you wearing?","max_duration":15,"difficulty":"medium","context":{"role":"Solutions Engineer","company":"Wildix Partner","setting":"Boardroom","formality":"Business formal","tip":"Blazer or suit jacket. Tie optional. First impressions are everything."}},
+                {"id":"dress-video-call","title":"Video Call Interview","prompt":"Zoom interview. Show your top-half (what's visible on camera).","max_duration":15,"difficulty":"easy","context":{"role":"IT Support","company":"Various","setting":"Video call","formality":"Smart waist up","tip":"Solid colours on camera. Avoid busy patterns or all-black."}},
+                {"id":"dress-casual-friday","title":"Casual Team Day","prompt":"No client meetings — internal work and team lunch. What's the balance?","max_duration":15,"difficulty":"easy","context":{"role":"Field Engineer","company":"ETS Connect","setting":"Office","formality":"Smart relaxed","tip":"Clean jeans, decent tee or polo, trainers. No gym wear."}},
+                {"id":"dress-facial-hair","title":"Facial Hair Check","prompt":"Close-up of your face. AI reviews your grooming.","max_duration":15,"difficulty":"easy","context":{"role":"Any","company":"Any","setting":"Grooming","formality":"N/A","tip":"Define your neckline, trim strays, keep it intentional."}}
+            ]},
+            {"id":"negotiation","name":"Negotiation","icon":"🏆","scenarios":[
+                {"id":"salary-negotiation-offer","title":"Negotiate Starting Salary","prompt":"You've just received a job offer for a Network Engineer role. The salary is £32k but you were hoping for £38k. They're expecting a counter. Negotiate.","max_duration":90,"difficulty":"hard","context":{"role":"Network Engineer","company":"Bridgend CBC / Stefanini","salary":"Offered £32k, targeting £36-38k","location":"Bridgend / Cardiff","interviewer_tip":"Lead with value, not need. 'Based on my CCNA progress, field experience managing 200+ site deployments, and market data for this role in South Wales, I was hoping for £36k.' Be ready for 'that's the budget' and pivot to total comp."}},
+                {"id":"scope-creep-pushback","title":"Push Back on Scope Creep","prompt":"A client asked you to 'just quickly' configure their entire 50-handset network during a standard deployment visit. This was not in scope. Push back professionally.","max_duration":90,"difficulty":"hard","context":{"role":"Field Engineer","company":"ETS Connect","setting":"On-site at client","vibe":"'This wasn't in the scope I was given, but I can see it's important. Let me check what can be done today vs what needs a separate visit.' Keep it helpful, not defensive."}},
+                {"id":"rate-negotiation-contract","title":"Contract Rate Negotiation","prompt":"A recruiter for a 6-month NOC contract offers you £175/day. You want £225/day based on your qualifications and experience. Negotiate with the recruiter.","max_duration":90,"difficulty":"hard","context":{"role":"NOC Engineer (Contract)","company":"Indigo Telecom / Recruiter","salary":"Offered £175/day, targeting £200-225/day","vibe":"Recruiters expect negotiation. 'I'm looking at £200-225/day for this level of responsibility. I've got CCNA-level networking, VoIP expertise, and I can hit the ground running without ramp-up.'"}},
+                {"id":"promotion-discussion","title":"Discussing a Promotion Path","prompt":"You've been a Field Engineer for 18 months. You want a clear path to Senior Field Engineer or moving into the NOC. Start the conversation with your manager.","max_duration":120,"difficulty":"medium","context":{"role":"Field Engineer","company":"ETS Connect","vibe":"'I'm enjoying the role and I want to grow here. Can we talk about what it would take to move to the next level in the next 6-12 months?' Shows ambition without demands."}},
+                {"id":"equipment-budget-pitch","title":"Pitch for Tooling Budget","prompt":"Your site laptop is 4 years old and crashing during deployments. You need a £1,200 replacement. Convince your manager without sounding like you're complaining.","max_duration":90,"difficulty":"easy","context":{"role":"Field Engineer","company":"ETS Connect","vibe":"Frame it as productivity, not a complaint. 'My current laptop is struggling with multi-site configs and costing me about 2 hours per week in delays. A new one pays for itself in a few months.'"}},
+                {"id":"consultant-upsell","title":"Upsell a Premium Service","prompt":"A happy existing client could benefit from your 24/7 NOC monitoring add-on (£500/month). They're not asking for it — sell them on the value of proactive monitoring.","max_duration":90,"difficulty":"medium","context":{"role":"Account Manager / Engineer","company":"ETS Connect","vibe":"'You're running a 24/7 operation. Your current setup only alerts you when something breaks. The NOC service catches issues before they affect your stores. Here's how it saved [similar client] £3k in outage costs last quarter.'"}},
+                {"id":"asking-for-ccna-support","title":"Ask for Exam Fee Sponsorship","prompt":"Your CCNA exam is £300 and you want the company to cover it. They've never sponsored certs before. Make the case.","max_duration":90,"difficulty":"medium","context":{"role":"Field Engineer","company":"ETS Connect","vibe":"'My CCNA qualification directly benefits our VoIP work — better network troubleshooting, fewer repeat site visits, and it strengthens our credibility with clients. The exam costs less than a single repeat call-out.'"}},
+                {"id":"post-offer-negotiation","title":"Counter a Lowball Offer","prompt":"You nailed the interview for a Junior Security Analyst role at Bridewell. They offered £26k. Market rate is £30k+. You have 48 hours to respond. Counter without losing the offer.","max_duration":90,"difficulty":"hard","context":{"role":"Junior Security Analyst","company":"Bridewell","salary":"Offered £26k, targeting £30-32k","interviewer_tip":"Stay warm and enthusiastic about the role. 'I'm really excited about Bridewell and this team. Based on my certs, field experience, and similar roles in Cardiff, I was hoping for £30k. Is there flexibility?'"}}
+            ]},
+            {"id":"networking-relationships","name":"Networking & Relationships","icon":"🤝","scenarios":[
+                {"id":"informational-interview","title":"Informational Interview Request","prompt":"You found a Senior Network Engineer on LinkedIn who works at Principality BS. You want to ask for 15 minutes of their time to learn about the role. Send a voice note / have the conversation.","max_duration":60,"difficulty":"easy","context":{"role":"Aspiring Network Engineer","company":"Self / CCNA Student","vibe":"Be specific, respectful of time. 'Hi [Name], I'm currently studying for my CCNA and working as a VoIP field engineer. I'm really interested in moving into networking and saw your background at Principality. Could I buy you a coffee for 15 minutes to hear about your journey?'"}},
+                {"id":"conference-follow-up","title":"Conference Follow-Up","prompt":"You met a hiring manager from Companies House at a Cardiff tech meetup. You had a great 5-minute chat. Send a follow-up message the next day.","max_duration":60,"difficulty":"easy","context":{"role":"Network / VoIP Engineer","company":"Self","vibe":"Reference something specific from your chat. 'Great meeting you at the meetup — really enjoyed your point about IaC in the public sector. If you're ever looking for someone with field networking experience and CCNA-level knowledge, I'd love to chat.'"}},
+                {"id":"linkedin-voice-intro","title":"LinkedIn Voice Introduction","prompt":"You're reaching out to the Head of IT at a company you'd love to work for. You don't know them. Leave a short professional voice intro / write a compelling first message.","max_duration":45,"difficulty":"medium","context":{"role":"Network Engineer Candidate","company":"Various / Target Company","vibe":"Short, specific, value-first. 'Hi [Name], I'm a CCNA-qualified engineer with 3 years of VoIP deployment experience across 100+ sites. I've followed [Company]'s growth and would love to bring my networking skills to your team. Open to a 10-min chat?'"}},
+                {"id":"asking-for-referral","title":"Ask for a Job Referral","prompt":"You know someone who works at a company you're applying to. You need to ask them for a referral without making it awkward.","max_duration":60,"difficulty":"medium","context":{"role":"Job Seeker","company":"Self / Referral Target","vibe":"Make it easy for them. 'Hey [Name], I noticed [Company] is hiring for a Network Engineer role I'm perfect for. I know you there — would you feel comfortable referring me? Happy to send you my CV so you can see what to share.'"}},
+                {"id":"introducing-self-to-team","title":"Introducing Yourself to a New Team","prompt":"You've just joined a new IT team. There's a Slack channel intro / team standup. Introduce yourself in a way that makes people want to work with you.","max_duration":60,"difficulty":"easy","context":{"role":"Network / IT Engineer","company":"New employer","vibe":"'Hey team, I'm [Name]. I've spent the last few years doing VoIP deployments across Wales, and I'm currently finishing my CCNA. Looking forward to getting stuck into the network projects here. If anyone wants a coffee and a chat about networking or the best places for lunch in Cardiff, I'm all ears.'"}},
+                {"id":"thank-you-after-interview","title":"Post-Interview Thank You","prompt":"You just finished a 2nd round interview for a Network Engineer role. Send a thank-you message that reinforces why you're the right person.","max_duration":60,"difficulty":"easy","context":{"role":"Network Engineer Candidate","company":"Interview Target","vibe":"Reference a specific moment. 'Thanks again for your time today — especially the deep dive on your SD-WAN rollout. It confirmed this is exactly the kind of environment I want to grow in. I'm confident my field deployment experience and CCNA knowledge would add value from day one.'"}},
+                {"id":"reconnecting-with-ex-colleague","title":"Reconnecting with a Former Colleague","prompt":"A former colleague has moved to a company you're targeting. You haven't spoken in 2 years. Reach out and rekindle the connection naturally.","max_duration":60,"difficulty":"medium","context":{"role":"Network Engineer","company":"Self / Reconnect Target","vibe":"'Hey [Name], long time! I was thinking about our [project/deployment] days and saw you're at [Company] now — awesome. How's life treating you? I'd love to catch up properly.' Let it be genuine first, business second."}}
+            ]},
+            {"id":"tech-interviews","name":"Technical Interview Deep Dives","icon":"🔧","scenarios":[
+                {"id":"explain-ospf","title":"Explain OSPF to a Non-Technical Manager","prompt":"Your manager (ex-accountant, now IT director) asks you to explain why you're recommending OSPF over static routing. No jargon. They need to justify it to the finance director.","max_duration":90,"difficulty":"medium","context":{"role":"Network Engineer","company":"Various","interviewer_tip":"Analogy: 'Static routes are like giving someone directions every time they drive somewhere. OSPF is like giving them a GPS. If a road closes, the GPS finds another route automatically. This means less manual work for us and fewer outages for the business.'"}},
+                {"id":"troubleshoot-scenario","title":"Walk Through a Network Troubleshooting Scenario","prompt":"A retail store reports that their phones and tills are offline. They can't process card payments. Walk the interviewer through your troubleshooting methodology from first notification to resolution.","max_duration":120,"difficulty":"hard","context":{"role":"Network / Field Engineer","company":"ETS Connect / Target Company","interviewer_tip":"Think aloud, be methodical. 1) Is it just this site or multiple? 2) Check remote connectivity (ping gateway, DNS, WAN IP). 3) Check switch status / PoE for phones. 4) Check router logs. 5) Check ISP status. 6) Escalate or dispatch. SHOW don't just tell — use a real example."}},
+                {"id":"design-vlan","title":"Design a VLAN Architecture for 3 Sites","prompt":"A client with 3 sites (HQ 200 users, warehouse 50, remote office 30) needs a VLAN architecture. They run VoIP, data, and CCTV on separate networks. Describe your design verbally.","max_duration":120,"difficulty":"hard","context":{"role":"Network Engineer","company":"Client / Consultancy","interviewer_tip":"Cover: VLAN separation (Voice/Data/CCTV/Management/ Guest), VLAN tagging (trunk vs access ports), inter-VLAN routing at the core, QoS for voice traffic, and ACLs between CCTV and data. Mention 802.1Q and why you'd put VoIP on its own VLAN."}},
+                {"id":"voip-call-flow","title":"Explain a VoIP Call Flow","prompt":"Interview question: 'Walk me through what happens when someone picks up a handset and makes a call on a hosted VoIP system.' Explain it clearly.","max_duration":90,"difficulty":"medium","context":{"role":"VoIP / Network Engineer","company":"Target Company / Interview","interviewer_tip":"Step by step: 1) Phone registers with PBX via SIP (DHCP → DNS → SIP server). 2) User dials → phone sends INVITE via SIP. 3) PBX routes call (on-net or off-net via SIP trunk). 4) RTP stream established between endpoints. 5) Call termination via BYE. Mention codecs, NAT traversal, and what can go wrong (firewall, bandwidth, jitter)."}},
+                {"id":"stp-troubleshoot","title":"Troubleshoot a Spanning Tree Loop","prompt":"A site has intermittent connectivity — devices lose connection for 30 seconds at a time. You suspect a spanning tree issue. Talk through your diagnosis and fix plan.","max_duration":120,"difficulty":"hard","context":{"role":"Network Engineer / CCNA Candidate","company":"Interview / Technical Assessment","interviewer_tip":"Signs: intermittent connectivity, high CPU on switches, MAC flapping logs. Commands: show spanning-tree, show mac address-table, show interfaces. Look for: non-designated ports in forwarding state or topology change notifications every few seconds. Fix: trace the loop via CDP/LLDP, shut down the offending port, then redesign the topology."}},
+                {"id":"ccna-subnetting","title":"Solve a Subnetting Problem Out Loud","prompt":"Interviewer: 'You have a /24 network and need 4 subnets with at least 50 hosts each. Walk me through your subnetting.' Do it verbally.","max_duration":90,"difficulty":"medium","context":{"role":"CCNA Candidate","company":"Interview","interviewer_tip":"Talk through the math: need 6 bits for 50 hosts (2^6-2=62). Borrow 2 bits from /24 → /26 subnets. Each /26 has 64 addresses, 62 usable. Subnets: 0-63, 64-127, 128-191, 192-255. Network IDs: .0, .64, .128, .192. Mask: 255.255.255.192. Say it confidently — they're testing process, not speed."}},
+                {"id":"explain-dhcp-dns","title":"Explain DHCP & DNS Interaction","prompt":"Interview question: 'A new laptop connects to the network and gets an IP via DHCP, but can't browse websites. Walk through the troubleshooting steps.'","max_duration":90,"difficulty":"easy","context":{"role":"IT Support / Network Engineer","company":"Various / Interview","interviewer_tip":"1) Did it get an IP (ipconfig/ifconfig)? 2) Can it ping the gateway? 3) Can it ping 8.8.8.8? 4) Can it resolve a domain (nslookup)? 5) If DNS fails → check DNS server config in DHCP scope. If ping to 8.8.8.8 fails → check routing/firewall. Show systematic thinking."}},
+                {"id":"firewall-basics","title":"Explain Stateful vs Stateless Firewall","prompt":"Your interviewer asks: 'What's the difference between a stateful and stateless firewall, and when would you use each?' Give a clear, practical answer.","max_duration":60,"difficulty":"medium","context":{"role":"Network Engineer Candidate","company":"Interview / Technical Screen","interviewer_tip":"Stateful: tracks connection state, allows return traffic automatically, uses more resources. Stateless: checks each packet individually, faster but needs explicit rules for return traffic. Analogy: 'Stateful is a bouncer who remembers who's already inside. Stateless checks everyone's ID every time they walk past.'"}},
+                {"id":"voice-vlan-qos","title":"Design QoS for Voice Traffic","prompt":"Your client reports choppy call quality on their new VoIP system. They have voice and data on the same switch. Walk through your QoS design recommendations.","max_duration":90,"difficulty":"hard","context":{"role":"VoIP / Network Engineer","company":"ETS Connect / Client","interviewer_tip":"Steps: 1) Trust boundaries — set switchports to trust CoS/DSCP from IP phones. 2) Mark VoIP control (SIP) as AF41 and VoIP data (RTP) as EF. 3) Apply queuing — strict priority queue for EF traffic. 4) Police or shape best-effort traffic. 5) Test with iperf before and after. 'Voice is delay-sensitive, not bandwidth-hungry. 100kbps per call with proper QoS beats 1Gbps without it.'"}}
+            ]},
+            {"id":"career-growth","name":"Career Growth & Mentorship","icon":"📈","scenarios":[
+                {"id":"asking-for-mentor","title":"Ask Someone to Mentor You","prompt":"A Senior Network Engineer at a client site seems willing to help. You want to ask them formally to mentor you through your CCNA-to-CCNP journey. Have the conversation.","max_duration":90,"difficulty":"medium","context":{"role":"Junior Network / VoIP Engineer","company":"ETS Connect / Client Site","vibe":"'I really respect the way you handled that STP issue last week. I'm working through my CCNA and would love to learn from someone with your experience. Could I buy you a coffee every couple of weeks and pick your brain?' Humble, specific, low-commitment ask."}},
+                {"id":"present-to-manager","title":"Present Your Growth Plan to Your Manager","prompt":"You want to transition from Field Engineer to Network Engineer within 18 months. Present a concrete development plan to your manager. Show them you've thought it through.","max_duration":120,"difficulty":"medium","context":{"role":"Field Engineer","company":"ETS Connect","vibe":"'Here's my plan: CCNA complete by March, then I want to shadow the NOC team for one shift per month, take on more network-related tickets, and start my CCNP by September. I've identified 4 projects where I could add more value with networking skills.' Shows you've done the work before asking."}},
+                {"id":"bad-performance-review","title":"Handle a Tough Performance Review","prompt":"Your manager says you've had too many repeat site visits and your ticket closure rate is below team average. Respond professionally without getting defensive.","max_duration":90,"difficulty":"hard","context":{"role":"Field Engineer","company":"ETS Connect","vibe":"Listen first. 'I appreciate you bringing this up. I've noticed a few of those repeat visits too — usually tied to incomplete client-side prep. I'd like to suggest a pre-site checklist that catches these before I arrive. Can I draft one for us to review?' Turns criticism into solution."}},
+                {"id":"asking-for-more-responsibility","title":"Ask for Stretch Assignments","prompt":"You've been doing standard deployments for a year. You want more challenging work — network design, client consulting, or training junior engineers. Ask without sounding bored or ungrateful.","max_duration":90,"difficulty":"medium","context":{"role":"Field Engineer","company":"ETS Connect","vibe":"'I'm grateful for the deployment work — I've done 80+ sites now and I'm hitting my SLAs consistently. I'd love to start contributing on the network design side or helping train the new starters. Is there a project coming up where I could shadow or assist?'"}},
+                {"id":"imposter-syndrome-conversation","title":"Talk Through Imposter Syndrome","prompt":"You're in a new role and feel out of your depth. Everyone else seems to know more. Talk it through with a trusted senior colleague who's been there.","max_duration":90,"difficulty":"easy","context":{"role":"New Network Engineer","company":"Any new role","vibe":"'I'll be honest — I'm feeling a bit out of my depth. Everyone here has so much experience and I'm still connecting dots. Did you feel this way when you started? How did you get through it?' Vulnerability builds connection. They've all been there."}},
+                {"id":"career-pivot-explanation","title":"Explain Your VoIP-to-Networking Pivot","prompt":"Interviewer asks: 'Your background is VoIP field engineering. Why networking?' Give a compelling answer that frames the shift as a natural progression, not a random change.","max_duration":60,"difficulty":"easy","context":{"role":"Network Engineer Candidate","company":"Interview / Any","interviewer_tip":"'VoIP is networking with a voice application layer. Every deployment I've done — DECT migrations, QoS configs, VLAN segmentation, SIP trunking — is applied networking. I've loved the underlying infrastructure work more than the voice apps themselves, so I want to go deeper into the foundation.'"}},
+                {"id":"certification-study-group","title":"Kick Off a Study Group","prompt":"You want to start a weekly CCNA study group at work or online. You need to pitch it to colleagues/managers and get buy-in.","max_duration":60,"difficulty":"easy","context":{"role":"CCNA Student","company":"ETS Connect / Self","vibe":"'I'm proposing a weekly 1-hour CCNA study group — Wednesdays at lunch. We pick a topic, discuss real scenarios, and run through practice questions. It helps everyone pass faster and our team gets more certified engineers. Who's in?'"}},
+                {"id":"professional-ghosting","title":"Re-engage After Ghosting a Recruiter","prompt":"A recruiter reached out 3 months ago. You were interested, then life got busy and you ghosted them. Now you want to re-engage without looking flaky.","max_duration":60,"difficulty":"easy","context":{"role":"Job Seeker","company":"Self","vibe":"'Hi [Name], I owe you an apology — things got hectic on my end and I dropped the ball. I'm now in a position to pick up that conversation about the Network Engineer role if it's still open. No worries if it's gone, but I'd love to reconnect.' Honest and low-pressure."}}
+            ]},
+            {"id":"client-management","name":"Client Management","icon":"👥","scenarios":[
+                {"id":"quarterly-review-meeting","title":"Quarterly Account Review","prompt":"You're presenting a quarterly review to a retail client with 30 sites. Services have been stable, but there were two short outages. Own them and present next quarter's plan.","max_duration":120,"difficulty":"hard","context":{"role":"Account Manager / Engineer","company":"ETS Connect","vibe":"Lead with the good: '99.6% uptime across all sites this quarter.' Own the outages: 'Two incidents — one was an ISP failure (resolved in 45 min), one was a config issue we've patched.' Forward-looking: 'Next quarter we're upgrading 8 sites to redundant WAN links for free.'"}},
+                {"id":"scope-creep-client","title":"Handle Scope Creep at Client Site","prompt":"You're on a standard deployment and the client keeps adding requests. 'While you're here, can you also...' They're now asking for 3 extra hours of work. Handle it.","max_duration":90,"difficulty":"medium","context":{"role":"Field Engineer","company":"ETS Connect","vibe":"'I can definitely help with that. Let me check my schedule — I have another site after this. I can do X now, but Y and Z would need to be a separate visit or I can ask the office to extend my time here if that works for you.' Keeps you in control, not the client."}},
+                {"id":"introducing-new-service","title":"Introducing a New Service to a Client","prompt":"Your company now offers a managed SD-WAN service alongside hosted VoIP. Present it to an existing client who doesn't know they need it yet.","max_duration":90,"difficulty":"medium","context":{"role":"Solutions Engineer","company":"ETS Connect / Wildix Partner","vibe":"Start with their known pain: 'You've mentioned your branch offices struggle with call quality during peak times. SD-WAN solves that by intelligently routing traffic across multiple connections. It also gives you visibility into every site's performance from one dashboard.'"}},
+                {"id":"walking-nontech-through-issue","title":"Explain a Complex Outage to a Non-Technical Client","prompt":"A store manager with zero tech background is furious that their phones have been down for 2 hours. They don't care about BGP flapping or SIP registration failures. Explain what happened in plain English.","max_duration":90,"difficulty":"easy","context":{"role":"Field Engineer","company":"ETS Connect","vibe":"'Basically, the internet connection to your store had a problem that affected your phones. Think of it like a power cut — your phones couldn't reach the exchange. We've fixed it now and we're installing a backup line so if it happens again, your phones switch automatically without you noticing.'"}},
+                {"id":"getting-buy-in-hardware-upgrade","title":"Get Buy-In for a Hardware Upgrade","prompt":"You've identified that a client's 5-year-old switches are causing intermittent issues. They don't want to spend £8k on replacements. Convince them it's worth it.","max_duration":120,"difficulty":"hard","context":{"role":"Network / VoIP Engineer","company":"ETS Connect","vibe":"Don't lead with tech specs. Lead with cost of doing nothing: 'You've had 3 outages in 6 months related to those switches. Each outage costs you roughly £X in lost sales and staff downtime. The replacement pays for itself in under a year — and you get better call quality and faster troubleshooting.'"}},
+                {"id":"managing-client-expectations","title":"Reset Unrealistic Project Timelines","prompt":"A client wants a 50-site VoIP rollout completed in 2 weeks. You know it needs 6 weeks minimum. Reset expectations without losing the deal.","max_duration":90,"difficulty":"hard","context":{"role":"Project Engineer","company":"ETS Connect","vibe":"'I understand the urgency. Here's what's realistic: site surveys alone take 2 weeks for 50 sites. If we push too fast, we risk issues that cause downtime — which costs more than taking the extra time. I can get you a phased plan that delivers the first 10 sites in 3 weeks, then 10 per week after that.'"}},
+                {"id":"client-complaint-de-escalation","title":"De-Escalate an Angry Client","prompt":"A client is shouting on the phone. Their entire phone system has been down for 6 hours and no one told them why. Their business is losing money every minute. Calm them down.","max_duration":90,"difficulty":"hard","context":{"role":"Field Engineer / Support","company":"ETS Connect","vibe":"Let them vent first. Don't interrupt. Then: 'You're right to be angry. 6 hours is unacceptable and you deserved better communication. Here's what I know right now, here's what I'm doing to fix it, and here's exactly when you'll hear from me next. My personal number is [X] — call me directly if you don't get an update in 30 minutes.'"}},
+                {"id":"firing-a-bad-client","title":"Gracefully Exit a Problem Client","prompt":"A client is consistently abusive to your field engineers, refuses to pay on time, and demands unreasonable SLA guarantees. Your manager has agreed you can let them go. Have the conversation.","max_duration":90,"difficulty":"hard","context":{"role":"Account Manager / Lead Engineer","company":"ETS Connect","vibe":"Professional, final, no negotiation: 'After careful review, we've decided we're not the right fit for your needs going forward. We'll honour our notice period and ensure a smooth handover to your next provider. We recommend [Competitor] for your type of setup. Here's our transition plan.' No JADE (Justify, Argue, Defend, Explain)."}},
+                {"id":"post-outage-follow-up","title":"Post-Outage Follow-Up & Restore Confidence","prompt":"A major outage affected a client for 4 hours last week. You fixed it. Now you need to follow up, explain the root cause, and restore their confidence in your service.","max_duration":90,"difficulty":"medium","context":{"role":"Network Engineer","company":"ETS Connect","vibe":"'Here's what happened: [simple explanation]. Here's what we've done since: [concrete actions — redundant link installed, monitoring alert added, config hardened]. Here's our commitment: [specific SLA improvement]. We've taken this seriously — here's the written post-mortem if you want the technical detail.'"}}
+            ]},
+            {"id":"learning","name":"Learning — Teach It","icon":"📚","scenarios":[
+                {"id":"learn-osi-model","title":"Explain the OSI Model","prompt":"Teach the OSI 7-layer model as if you're explaining it to a junior engineer who just started studying for their CCNA. Focus on what each layer does and a memorable way to remember them.","max_duration":180,"difficulty":"easy","context":{"role":"CCNA Student (Teacher)","company":"Self-study","topic":"OSI Model","teaching_tip":"Use a real-world analogy. Mnemonic: 'All People Seem To Need Data Processing'."}},
+                {"id":"learn-subnetting","title":"Teach Subnetting & VLSM","prompt":"Explain how subnetting works. Cover: why we subnet, the relationship between subnet mask and number of hosts, and how Variable Length Subnet Masks (VLSM) save addresses. Use an example.","max_duration":240,"difficulty":"medium","context":{"role":"CCNA Student (Teacher)","company":"Self-study","topic":"Subnetting / VLSM","teaching_tip":"Start with 'why' — a /24 has 254 hosts but a small office needs 10. Walk through 192.168.1.0/24 into 4 /26 subnets."}},
+                {"id":"learn-vlans","title":"Explain VLANs to a Non-Technical Person","prompt":"Your store manager asks: 'Why can't the CCTV cameras talk to the same network as the tills and phones?' Explain VLANs in plain English so they understand the security and performance benefits.","max_duration":120,"difficulty":"easy","context":{"role":"Field Engineer (Teacher)","company":"ETS Connect","topic":"VLANs","teaching_tip":"Analogy: VLANs are separate rooms in a house sharing one building (the switch). Trunking is the hallway connecting rooms."}},
+                {"id":"learn-ospf","title":"Explain How OSPF Works","prompt":"Teach OSPF basics: what it is, how routers discover each other, how they build a topology map, and why OSPF converges faster than RIP. Keep it accessible for a CCNA student.","max_duration":240,"difficulty":"hard","context":{"role":"CCNA Student (Teacher)","company":"Self-study","topic":"OSPF","teaching_tip":"Routers are neighbours on a street. They say hello, exchange address books, and build a complete map. Cover: hello packets, LSAs, DR/BDR, SPF algorithm."}},
+                {"id":"learn-stp","title":"Explain Spanning Tree Protocol","prompt":"Teach STP: why we need it (broadcast storms, MAC table instability, multiple frame copies), how it works (root bridge, root ports, designated ports), and what happens when a link fails.","max_duration":240,"difficulty":"hard","context":{"role":"CCNA Student (Teacher)","company":"Self-study","topic":"Spanning Tree Protocol","teaching_tip":"Analogy: redundant links = two roads to the same town. Without STP, the GPS tells everyone to take both roads at once — chaos. Cover root bridge election and port roles."}},
+                {"id":"learn-nat","title":"Explain NAT & PAT","prompt":"Explain how NAT allows hundreds of devices to share one public IP address. Cover: static NAT, dynamic NAT, and PAT (overload). Use a real-world analogy.","max_duration":180,"difficulty":"medium","context":{"role":"CCNA Student (Teacher)","company":"Self-study","topic":"NAT / PAT","teaching_tip":"NAT is a company receptionist. Everyone has an internal extension (private IP). Callers dial the main number (public IP), receptionist directs them. PAT remembers who called whom."}},
+                {"id":"learn-tcp-vs-udp","title":"Explain TCP vs UDP","prompt":"Teach the difference between TCP and UDP. Cover: connection-oriented vs connectionless, reliability vs speed, sequencing and acknowledgements, and real-world examples of when to use each.","max_duration":120,"difficulty":"easy","context":{"role":"CCNA Student (Teacher)","company":"Self-study","topic":"TCP vs UDP","teaching_tip":"TCP = registered post (tracked, signed for, resent if lost). UDP = tossing a frisbee (fast, no tracking). Examples: TCP = web/email. UDP = VoIP/streaming/gaming."}},
+                {"id":"learn-dns-resolution","title":"Explain DNS Resolution Step by Step","prompt":"Walk through what happens when someone types 'google.com' into a browser and presses Enter. Cover: browser cache, OS cache, recursive resolver, root servers, TLD servers, authoritative servers.","max_duration":180,"difficulty":"easy","context":{"role":"CCNA Student (Teacher)","company":"Self-study","topic":"DNS Resolution","teaching_tip":"DNS is the phonebook of the internet. Walk: local cache → ISP resolver → root → .com → google.com → TTL and caching."}},
+                {"id":"learn-dhcp-dora","title":"Explain the DHCP DORA Process","prompt":"Teach how DHCP works. Cover: the four-step DORA process (Discover, Offer, Request, Acknowledge), why each step exists, and what happens if a device can't reach a DHCP server (APIPA).","max_duration":120,"difficulty":"easy","context":{"role":"CCNA Student (Teacher)","company":"Self-study","topic":"DHCP","teaching_tip":"Analogy: DHCP is hotel check-in. Discover = 'Got free rooms?' Offer = 'Room 204.' Request = 'I'll take it.' Acknowledge = 'Here's your key card.'"}},
+                {"id":"learn-ethernet-switching","title":"Explain Ethernet Switching Basics","prompt":"Teach how a switch learns MAC addresses and forwards frames. Cover: MAC address table (CAM table), flooding for unknown unicast, filtering, and the difference between hubs and switches.","max_duration":150,"difficulty":"medium","context":{"role":"CCNA Student (Teacher)","company":"Self-study","topic":"Ethernet Switching","teaching_tip":"A switch builds a map of which MAC lives on which port. First time = floods (knocks on every door). Next time = knows the exact door. Cover learning, forwarding, filtering, aging."}},
+                {"id":"learn-acls","title":"Teach Access Control Lists (ACLs)","prompt":"Explain ACLs: what they're used for, the difference between standard and extended ACLs, how wildcard masks work, and the implied 'deny any' at the end. Walk through a real example of securing a router's management access.","max_duration":180,"difficulty":"medium","context":{"role":"CCNA Student (Teacher)","company":"Self-study","topic":"Access Control Lists","teaching_tip":"Analogy: ACLs are like a bouncer's guest list. Standard = checks your name (source IP). Extended = checks name, who you're visiting, what you're carrying. Emphasise implicit deny and top-down processing."}},
+                {"id":"learn-etherchannel","title":"Explain EtherChannel & Link Aggregation","prompt":"Teach EtherChannel: why STP wastes bandwidth on redundant links and how EtherChannel bundles them into one logical link. Cover LACP vs PAgP, load balancing by flow, and configuration basics.","max_duration":180,"difficulty":"medium","context":{"role":"CCNA Student (Teacher)","company":"Self-study","topic":"EtherChannel","teaching_tip":"Analogy: STP = 4 motorways but only one in use. EtherChannel merges them into one 4-lane motorway. LACP = open standard (active/passive). PAgP = Cisco proprietary (desirable/auto)."}},
+                {"id":"learn-inter-vlan-routing","title":"Explain Inter-VLAN Routing","prompt":"Teach how devices in different VLANs communicate. Cover: legacy (separate interfaces), router-on-a-stick with subinterfaces and 802.1Q trunking, and Layer 3 switching. Explain why each method exists and when to use it.","max_duration":180,"difficulty":"medium","context":{"role":"CCNA Student (Teacher)","company":"Self-study","topic":"Inter-VLAN Routing","teaching_tip":"Analogy: VLANs = different floors in a building. Router-on-a-stick = single staircase. Layer 3 switch = multiple express lifts. Cover subinterfaces, encapsulation dot1q, and native VLAN."}},
+                {"id":"learn-ipv6-basics","title":"Teach IPv6 Addresses & Why It Exists","prompt":"Explain IPv6: why NAT was a workaround not a solution, the 128-bit address format, compression rules (leading zeros, double colon), and the different address types (global unicast, link-local, unique local).","max_duration":180,"difficulty":"hard","context":{"role":"CCNA Student (Teacher)","company":"Self-study","topic":"IPv6 Addressing","teaching_tip":"Start with why: NAT breaks end-to-end. IP phones need real IPs for SIP/RTP. Show compression: 2001:0db8:0000:0000:0000:8a2e:0370:7334 → 2001:db8::8a2e:370:7334."}},
+                {"id":"learn-hsrp","title":"Explain HSRP & First Hop Redundancy","prompt":"Teach First Hop Redundancy Protocols, focusing on HSRP. Explain why you need a virtual gateway IP, how the active/standby election works, and what happens when the active router fails. Cover the difference between HSRP and VRRP.","max_duration":180,"difficulty":"hard","context":{"role":"CCNA Student (Teacher)","company":"Self-study","topic":"HSRP / FHRP","teaching_tip":"Analogy: HSRP = backup pilot. Active flies, standby watches. Active fails → standby takes over instantly. Clients never reconfigure because the virtual IP stays the same."}},
+                {"id":"learn-port-security","title":"Teach Switch Port Security","prompt":"Explain port security: why you'd limit MAC addresses on a switchport, sticky MAC learning, the three violation modes (shutdown, restrict, protect), and how to recover from err-disabled state. Use a real access port example.","max_duration":150,"difficulty":"easy","context":{"role":"CCNA Student (Teacher)","company":"Self-study","topic":"Port Security","teaching_tip":"Analogy: Port security = hotel key card. Only registered guest (MAC) enters that room (port). Shutdown = err-disabled (manual recovery). Restrict = logs but stays up. Protect = silently drops, no log."}},
+                {"id":"learn-qos-voip","title":"Explain Why QoS Matters for VoIP","prompt":"Teach QoS fundamentals: why converged networks need it, the three QoS tools (queuing, shaping, policing), and how CoS and DSCP markings work. Use VoIP as the primary example since that's what you work with daily.","max_duration":240,"difficulty":"medium","context":{"role":"Field Engineer (Teacher)","company":"ETS Connect","topic":"QoS for VoIP","teaching_tip":"Start from your experience: Before convergence voice had dedicated lines. Now voice/data/video share one pipe. CoS 5 = voice payload, DSCP EF (46) = expedited forwarding for RTP. Trust boundaries on switchports."}},
+                {"id":"learn-stp-enhancements","title":"Teach STP Enhancements: PortFast, BPDU Guard & Root Guard","prompt":"Explain the three critical STP edge features: PortFast (instant forwarding for access ports), BPDU Guard (shuts down ports that receive BPDUs), and Root Guard (prevents rogue switches from becoming root bridge). Cover when and why to use each.","max_duration":180,"difficulty":"medium","context":{"role":"CCNA Student (Teacher)","company":"Self-study","topic":"STP Enhancements","teaching_tip":"Analogy: PortFast = not making visitors wait 30 seconds at the door. BPDU Guard = if someone tries to sneak STP messages from an access port, they get kicked out (err-disabled). Root Guard = protects the root bridge election."}},
+                {"id":"learn-wan-vpn","title":"Explain WAN Technologies & VPNs","prompt":"Teach WAN fundamentals: the difference between LAN, MAN, and WAN. Cover site-to-site vs remote-access VPNs, how IPsec + GRE work together for encrypted site-to-site tunnels, and why you'd choose a VPN over a private MPLS circuit.","max_duration":210,"difficulty":"hard","context":{"role":"CCNA Student (Teacher)","company":"Self-study","topic":"WANs & VPNs","teaching_tip":"Analogy: WAN = motorway network. VPN = armoured car. GRE wraps cargo in a box. IPsec locks the box. GRE over IPsec = locked armoured car that can carry any cargo (including routing protocols)."}}
+            ]},
+            {"id":"live","name":"Live Conversations","icon":"🎙️","scenarios":[
+                {"id":"live-placeholder","title":"🎙️ Live Practice","prompt":"Live practice session with Personaplex. Speak to a realistic AI persona.","max_duration":180,"difficulty":"medium","context":{"role":"You","company":"Personaplex","setting":"Live conversation","formality":"Natural","tip":"Coming soon — real-time conversations with AI personas."}}
+            ]}
+        ]};
+        renderCategories();
+    }
+}
+
+function renderCategories() {
+    const grid = document.getElementById('categoryGrid');
+    grid.innerHTML = '';
+    scenariosData.categories.forEach(cat => {
+        const card = document.createElement('div');
+        card.className = 'category-card';
+        card.innerHTML = `<div class="icon">${cat.icon}</div><h3>${cat.name}</h3><div class="count">${cat.scenarios.length}</div>`;
+        card.onclick = () => showScenarios(cat.id);
+        grid.appendChild(card);
+    });
+    refreshGameState();
+}
+
+function showScenarios(categoryId) {
+    const cat = scenariosData.categories.find(c => c.id === categoryId);
+    if (!cat) return;
+    currentCategory = cat;
+    document.getElementById('categoryTitle').textContent = cat.icon + ' ' + cat.name;
+    const list = document.getElementById('scenarioList');
+    list.innerHTML = '';
+
+    cat.scenarios.forEach(s => {
+        const completion = getScenarioCompletion(s.id);
+        const locked = !getTierUnlock(s.difficulty);
+        const passed = completion && completion.bestScore >= PASS_THRESHOLDS[s.difficulty];
+        const attempted = completion !== null;
+
+        let rightSide = '';
+        if (locked) {
+            rightSide = `<span class="locked-icon">🔒</span>`;
+        } else if (passed) {
+            rightSide = `<span style="display:flex;align-items:center;gap:0.3rem;">
+                <span class="completion-badge pass">✅ ${completion.bestScore.toFixed(1)}</span>
+                <span style="color:var(--text-muted);font-size:0.85rem;">→</span>
+            </span>`;
+        } else if (attempted) {
+            rightSide = `<span style="display:flex;align-items:center;gap:0.3rem;">
+                <span class="completion-badge fail">${completion.bestScore.toFixed(1)}</span>
+                <span style="color:var(--text-muted);font-size:0.85rem;">→</span>
+            </span>`;
+        } else {
+            rightSide = `<span style="color:var(--text-muted);font-size:0.85rem;">→</span>`;
+        }
+
+        const item = document.createElement('div');
+        item.className = `scenario-item ${passed ? 'completed' : ''} ${locked ? 'locked' : ''}`;
+        item.innerHTML = `
+            <div>
+                <div class="title">
+                    ${s.title}
+                    ${passed ? '<span style="font-size:0.8rem;">🏆</span>' : ''}
+                </div>
+                <div class="meta">
+                    <span class="difficulty ${s.difficulty}">${s.difficulty}</span>
+                    · ${s.max_duration}s
+                    · Pass ${PASS_THRESHOLDS[s.difficulty]}+
+                    · ${POINT_MULTIPLIERS[s.difficulty]}pts
+                </div>
+            </div>
+            ${rightSide}
+        `;
+        if (!locked) {
+            if (cat.id === 'live') {
+                item.onclick = () => showToast('🎙️ Live Conversations with Personaplex — coming soon!');
+            } else {
+                item.onclick = () => startRecording(s);
+            }
+        } else {
+            item.title = 'Complete all ' + TIER_ORDER[TIER_ORDER.indexOf(s.difficulty)-1] + ' scenarios first';
+        }
+        list.appendChild(item);
+    });
+    showView('view-scenarios');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RECORDING
+// ═══════════════════════════════════════════════════════════════
+
+async function startRecording(scenario) {
+    // Dress scenarios use photo mode instead
+    if (scenario.max_duration <= 15 && scenario.id.startsWith('dress-')) {
+        startPhotoCapture(scenario);
+        return;
+    }
+    currentScenario = scenario;
+    maxDuration = scenario.max_duration;
+    // Reset custom context for new scenario
+    customScenarioActive = false;
+    customContextStr = '';
+    document.getElementById('customToggleBtn').textContent = '✏️ Customize Scenario';
+    document.getElementById('promptText').style.fontStyle = 'italic';
+    document.getElementById('promptText').textContent = scenario.prompt;
+    document.getElementById('recordBtn').textContent = '🎤';
+    document.getElementById('recordBtn').className = 'record-btn';
+    document.getElementById('recordBtn').disabled = true;
+    document.getElementById('recordHint').textContent = 'Requesting camera...';
+    document.getElementById('progressFill').style.width = '0%';
+    document.getElementById('recordingIndicator').classList.remove('active');
+    document.getElementById('countdown-overlay').classList.remove('active');
+
+    const ctx = scenario.context || {};
+    const ctxCard = document.getElementById('contextCard');
+    if (ctx.role || ctx.company) {
+        document.getElementById('ctxRoleTag').textContent = ctx.role || 'Professional';
+        document.getElementById('ctxJobTitle').textContent = ctx.job_title || ctx.role || 'Role';
+        document.getElementById('ctxCompany').textContent = ctx.company ? ctx.company + (ctx.location ? ' · ' + ctx.location : '') : '';
+        document.getElementById('ctxSalary').textContent = ctx.salary || '—';
+        document.getElementById('ctxDuration').textContent = scenario.max_duration + 's';
+        document.getElementById('ctxPassScore').textContent = PASS_THRESHOLDS[scenario.difficulty] + '+';
+        document.getElementById('ctxPoints').textContent = POINT_MULTIPLIERS[scenario.difficulty];
+        document.getElementById('ctxTip').textContent = ctx.interviewer_tip || ctx.vibe || 'Give it your best shot.';
+        ctxCard.style.display = 'block';
+    } else {
+        ctxCard.style.display = 'none';
+    }
+    showView('view-recording');
+    try {
+        mediaStream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } },
+            audio: true
+        });
+        const video = document.getElementById('videoPreview');
+        video.srcObject = mediaStream;
+        await video.play();
+        document.getElementById('recordBtn').disabled = false;
+        document.getElementById('recordHint').textContent = '🎤 Press to start';
+    } catch (err) {
+        document.getElementById('recordHint').textContent = '❌ Camera/mic denied. Allow permissions.';
+        showToast('Camera and microphone access required.');
+    }
+}
+
+function toggleRecording() {
+    isRecording ? stopRecording() : startCountdown();
+}
+
+function startCountdown() {
+    const overlay = document.getElementById('countdown-overlay');
+    const num = document.getElementById('countdown-number');
+    overlay.classList.add('active');
+    document.getElementById('recordBtn').disabled = true;
+    document.getElementById('recordHint').textContent = 'Get ready...';
+    let count = 3;
+    num.textContent = count;
+    const interval = setInterval(() => {
+        count--;
+        if (count > 0) { num.textContent = count; }
+        else { clearInterval(interval); overlay.classList.remove('active'); beginRecording(); }
+    }, 800);
+}
+
+function beginRecording() {
+    if (!mediaStream) return;
+    recordedChunks = []; isRecording = true; recordingSeconds = 0;
+    document.getElementById('recordBtn').textContent = '■';
+    document.getElementById('recordBtn').className = 'record-btn recording';
+    document.getElementById('recordHint').textContent = '🔴 Recording...';
+    document.getElementById('recordingIndicator').classList.add('active');
+    document.getElementById('recordingTime').textContent = '0:00';
+    clearInterval(recordingTimer);
+    recordingTimer = setInterval(() => {
+        recordingSeconds++;
+        const m = Math.floor(recordingSeconds/60), s = recordingSeconds%60;
+        document.getElementById('recordingTime').textContent = m+':'+s.toString().padStart(2,'0');
+        document.getElementById('progressFill').style.width = Math.min((recordingSeconds/maxDuration)*100,100)+'%';
+        if (recordingSeconds >= maxDuration) stopRecording();
+    }, 1000);
+    try {
+        const mime = MediaRecorder.isTypeSupported('video/webm;codecs=vp9,opus')
+            ? 'video/webm;codecs=vp9,opus'
+            : MediaRecorder.isTypeSupported('video/webm;codecs=vp8,opus')
+            ? 'video/webm;codecs=vp8,opus' : 'video/webm';
+        mediaRecorder = new MediaRecorder(mediaStream, { mimeType: mime });
+        mediaRecorder.ondataavailable = e => { if (e.data.size > 0) recordedChunks.push(e.data); };
+        mediaRecorder.onstop = uploadRecording;
+        mediaRecorder.start(100);
+    } catch(e) { showToast('Recording error: '+e.message); }
+}
+
+function stopRecording() {
+    if (!isRecording) return;
+    isRecording = false;
+    clearInterval(recordingTimer);
+    document.getElementById('recordBtn').disabled = true;
+    document.getElementById('recordHint').textContent = 'Processing...';
+    if (mediaRecorder && mediaRecorder.state !== 'inactive') mediaRecorder.stop();
+}
+
+// Patch uploadRecording to include custom_context
+async function uploadRecording() {
+    if (recordedChunks.length === 0) { showToast('No recording captured.'); resetRecorder(); return; }
+    showView('view-loading');
+    document.getElementById('analysisStatus').textContent = 'Uploading...';
+    const blob = new Blob(recordedChunks, {type:'video/webm'});
+    const fd = new FormData();
+    fd.append('video', blob, 'recording.webm');
+    fd.append('scenario_id', currentScenario.id);
+    fd.append('scenario_title', currentScenario.title);
+    fd.append('duration', recordingSeconds);
+    fd.append('category_id', currentScenario.categoryId || currentCategory?.id || '');
+    if (customContextStr) {
+        fd.append('custom_context', customContextStr);
+    }
+    try {
+        document.getElementById('analysisStatus').textContent = 'Transcribing...';
+        const resp = await fetch(API_BASE+'/api/analyze', {method:'POST', body: fd});
+        if (!resp.ok) throw new Error('Server error');
+        const result = await resp.json();
+        document.getElementById('analysisStatus').textContent = 'Scoring...';
+        lastResults = result;
+        if (result._is_demo) {
+            showToast('⚠️ Analysis had an issue — showing estimated scores. Try again.');
+        }
+        showResults(result);
+    } catch(e) {
+        document.getElementById('analysisStatus').textContent = '⚠️ Connection issue...';
+        await new Promise(r => setTimeout(r, 1200));
+        const demo = generateDemoResults(currentScenario);
+        demo._is_demo = true;
+        lastResults = demo;
+        showResults(demo);
+        const msg = e.message === 'Server error'
+            ? '⚠️ Server error — showing estimated scores.'
+            : '⚠️ Could not reach server — showing estimated scores.';
+        showToast(msg);
+    } finally { cleanupMedia(); resetRecorder(); }
+}
+
+function cleanupMedia() {
+    if (mediaStream) { mediaStream.getTracks().forEach(t=>t.stop()); mediaStream=null; }
+    const v = document.getElementById('videoPreview');
+    if (v.srcObject) v.srcObject = null;
+}
+function resetRecorder() { recordedChunks=[]; mediaRecorder=null; recordingSeconds=0; }
+
+// ═══════════════════════════════════════════════════════════════
+// RESULTS + GAME INTEGRATION
+// ═══════════════════════════════════════════════════════════════
+
+function showResults(result) {
+    document.getElementById('resultScenario').textContent = result.scenario_title || currentScenario.title;
+
+    // Show demo warning banner if applicable
+    const demoBanner = document.getElementById('resultBanner');
+    if (result._is_demo) {
+        demoBanner.style.display = 'block';
+        demoBanner.className = 'result-banner fail';
+        demoBanner.textContent = '⚠️ Estimated scores — AI analysis had an issue. Try recording again.';
+    } else {
+        demoBanner.style.display = 'none';
+    }
+
+    // Average score across active coaches = final score
+    const coachesData = result.coaches || {};
+    const activeKey = result.active_coach || 'comforter';
+    const activeCoach = coachesData[activeKey];
+    const coachesList = activeCoach ? [activeCoach] : [];
+    const avgScore = coachesList.length > 0 ? (coachesList[0].score || 0) : 5.0;
+    const difficulty = currentScenario.difficulty;
+    const passScore = PASS_THRESHOLDS[difficulty];
+    const passed = avgScore >= passScore;
+
+    // Points
+    const points = Math.round(avgScore * POINT_MULTIPLIERS[difficulty]);
+
+    // Save to game state
+    const prev = gameState.completed[currentScenario.id];
+    const isNewBest = !prev || avgScore > prev.bestScore;
+    if (isNewBest) {
+        if (prev) gameState.totalPoints -= prev.points; // remove old points
+        gameState.totalPoints += points;
+        gameState.completed[currentScenario.id] = {
+            bestScore: avgScore,
+            points: points,
+            totalAttempts: (prev ? prev.totalAttempts : 0) + 1,
+            bestTranscript: result.transcript || '',
+            difficulty: difficulty,
+            title: currentScenario.title
+        };
+    } else {
+        gameState.completed[currentScenario.id].totalAttempts = (prev.totalAttempts || 0) + 1;
+    }
+    saveGameState(gameState);
+    refreshGameState();
+
+    // Banner (skip if already showing demo banner)
+    const banner = document.getElementById('resultBanner');
+    if (!result._is_demo) {
+        banner.style.display = 'block';
+        banner.className = 'result-banner ' + (passed ? 'pass' : 'fail');
+        const tierEmoji = difficulty === 'easy' ? '🟢' : difficulty === 'medium' ? '🟡' : '🔴';
+        banner.textContent = passed
+            ? `✅ PASSED! (${avgScore.toFixed(1)}/${passScore}) ` + (isNewBest ? '🏆 New Best!' : '')
+            : `❌ ${avgScore.toFixed(1)}/${passScore} needed. ` + (isNewBest ? 'Best attempt so far!' : 'Keep trying!');
+    }
+
+    // Points display
+    const ptsEl = document.getElementById('pointsEarned');
+    if (passed && isNewBest) {
+        ptsEl.style.display = 'block';
+        ptsEl.innerHTML = `⭐ <strong>+${points}</strong> points earned!`;
+    } else if (passed) {
+        ptsEl.style.display = 'block';
+        ptsEl.innerHTML = `⭐ Already passed this scenario (best: ${prev.bestScore.toFixed(1)}). Keep practicing!`;
+    } else {
+        ptsEl.style.display = 'block';
+        ptsEl.innerHTML = `⭐ Would earn <strong>${points}pts</strong> on pass (need ${passScore.toFixed(1)})`;
+    }
+
+    // Coach card — show the active coach with category label
+    const grid = document.getElementById('coachGrid'); grid.innerHTML = '';
+    const activeLabel = activeKey === 'comforter' ? 'General Coach' : activeKey === 'closer' ? 'Sales Specialist' : activeKey === 'igniter' ? 'Presentation Specialist' : 'Technical Coach';
+    const categoryName = currentCategory?.name || '';
+
+    if (activeCoach) {
+        const card = document.createElement('div');
+        card.className = `coach-card ${activeKey}`;
+        let extraHTML = '';
+        // Show technical metrics if available
+        if (result.tech_scores) {
+            const t = result.tech_scores;
+            extraHTML = `<div style="margin-top:0.75rem;border-top:1px solid rgba(255,255,255,0.06);padding-top:0.6rem;">
+                <div style="font-size:0.65rem;font-weight:600;color:var(--text-muted);margin-bottom:0.35rem;">📊 Technical Breakdown</div>
+                <div class="metric-row"><span class="label">Accuracy</span><span class="val">${(t.accuracy||5).toFixed(1)}</span></div>
+                <div class="metric-track"><div class="fill" style="width:${((t.accuracy||5)/10)*100}%"></div></div>
+                <div class="metric-row"><span class="label">Clarity</span><span class="val">${(t.clarity||5).toFixed(1)}</span></div>
+                <div class="metric-track"><div class="fill" style="width:${((t.clarity||5)/10)*100}%"></div></div>
+                <div class="metric-row"><span class="label">Teaching Quality</span><span class="val">${(t.teaching_quality||5).toFixed(1)}</span></div>
+                <div class="metric-track"><div class="fill" style="width:${((t.teaching_quality||5)/10)*100}%"></div></div>
+                <div class="metric-row"><span class="label">Depth</span><span class="val">${(t.depth||5).toFixed(1)}</span></div>
+                <div class="metric-track"><div class="fill" style="width:${((t.depth||5)/10)*100}%"></div></div>
+                <div class="metric-row"><span class="label">Analogies</span><span class="val">${(t.use_of_analogies||5).toFixed(1)}</span></div>
+                <div class="metric-track"><div class="fill" style="width:${((t.use_of_analogies||5)/10)*100}%"></div></div>
+                <div class="metric-row"><span class="label">Structure</span><span class="val">${(t.structure||5).toFixed(1)}</span></div>
+                <div class="metric-track"><div class="fill" style="width:${((t.structure||5)/10)*100}%"></div></div>
+            </div>`;
+        }
+        card.innerHTML = `
+            <div class="emoji">${activeCoach.emoji}</div>
+            <div class="name">${activeCoach.name}</div>
+            <div class="focus">${activeCoach.focus}</div>
+            <div style="font-size:0.6rem;color:var(--text-muted);margin-bottom:0.5rem;">${activeLabel} · ${categoryName}</div>
+            <div class="score">${(activeCoach.score||0).toFixed(1)}</div>
+            <div class="score-label">/ 10</div>
+            <div style="font-size:0.65rem;color:var(--text-muted);margin-top:0.3rem;padding:0.3rem 0.5rem;background:rgba(255,255,255,0.04);border-radius:8px;">
+                ${activeCoach.short || 'Scored based on your response'}
+            </div>
+            ${extraHTML}`;
+        grid.appendChild(card);
+    }
+
+    // Feedback
+    const fl = document.getElementById('feedbackList'); fl.innerHTML = '';
+    (result.feedback||['Good job!']).forEach(tip => {
+        const li = document.createElement('li'); li.textContent = tip; fl.appendChild(li);
+    });
+
+    // Metrics
+    const mg = document.getElementById('metricsGrid'); mg.innerHTML = '';
+    const obj = result.objective_metrics||{};
+    [
+        {l:'Pace', v: obj.speaking_pace+' wpm'},
+        {l:'Words', v: obj.total_words},
+        {l:'Fillers', v: obj.filler_word_count+' ('+obj.filler_words_per_minute+'/min)'},
+        {l:'Duration', v: obj.duration_seconds+'s'}
+    ].forEach(m => {
+        const c = document.createElement('div'); c.className='metric-card';
+        c.innerHTML = `<div class="value">${m.v}</div><div class="label">${m.l}</div>`;
+        mg.appendChild(c);
+    });
+
+    // Transcript
+    document.getElementById('transcriptText').textContent = result.transcript || '[No transcript]';
+
+    showView('view-results');
+}
+
+function retryLast() { if (currentScenario) startRecording(currentScenario); }
+function pickNewScenario() { if (currentCategory) showScenarios(currentCategory.id); else showView('view-home'); }
+
+// ═══════════════════════════════════════════════════════════════
+// CUSTOM SCENARIO CONTEXT
+// ═══════════════════════════════════════════════════════════════
+
+let customScenarioActive = false;
+let customContextStr = '';
+
+function toggleCustomScenario() {
+    const panel = document.getElementById('customScenarioPanel');
+    const isOpen = panel.style.display !== 'none';
+    panel.style.display = isOpen ? 'none' : 'block';
+    document.getElementById('customToggleBtn').textContent = isOpen
+        ? '✏️ Customize Scenario'
+        : '✏️ Customize Scenario ▲';
+}
+
+async function parseJobUrl() {
+    const url = document.getElementById('jobUrlInput').value.trim();
+    if (!url) {
+        document.getElementById('parseStatus').textContent = '❌ Enter a URL first';
+        return;
+    }
+    const status = document.getElementById('parseStatus');
+    status.textContent = '⏳ Fetching and parsing job listing...';
+    document.getElementById('parseUrlBtn').disabled = true;
+
+    try {
+        const fd = new FormData();
+        fd.append('url', url);
+        const resp = await fetch(API_BASE + '/api/parse-job-url', { method: 'POST', body: fd });
+        const result = await resp.json();
+
+        if (result.success && result.parsed) {
+            const p = result.parsed;
+            // Build a nice summary string
+            const parts = [];
+            if (p.role) parts.push(`Role: ${p.role}`);
+            if (p.company) parts.push(`Company: ${p.company}`);
+            if (p.salary) parts.push(`Salary: ${p.salary}`);
+            if (p.location) parts.push(`Location: ${p.location}`);
+            if (p.summary) parts.push(`Summary: ${p.summary}`);
+            if (p.key_skills) parts.push(`Key Skills: ${p.key_skills}`);
+            if (p.industry) parts.push(`Industry: ${p.industry}`);
+
+            const desc = parts.join('\n');
+            document.getElementById('customScenarioDesc').value = desc;
+            status.textContent = '✅ Job listing parsed! Click "Apply Custom Context" to use it.';
+            status.style.color = 'var(--green)';
+
+            // Auto-apply
+            applyCustomScenario();
+        } else {
+            status.textContent = '❌ Could not parse the job listing. Try describing it manually.';
+            status.style.color = 'var(--pink)';
+        }
+    } catch (e) {
+        status.textContent = '❌ Failed to fetch URL. Try pasting the details manually.';
+        status.style.color = 'var(--pink)';
+    } finally {
+        document.getElementById('parseUrlBtn').disabled = false;
+    }
+}
+
+function applyCustomScenario() {
+    const desc = document.getElementById('customScenarioDesc').value.trim();
+    if (!desc) {
+        showToast('Enter some details or a job URL first.');
+        return;
+    }
+
+    customScenarioActive = true;
+    customContextStr = desc;
+
+    // Update the prompt text to reflect custom context
+    const promptEl = document.getElementById('promptText');
+    const originalPrompt = currentScenario ? currentScenario.prompt : '';
+    // Show the custom context in the prompt area
+    promptEl.textContent = originalPrompt + '\n\n[Custom: ' + desc.split('\n')[0].slice(0, 80) + '...]';
+    promptEl.style.fontStyle = 'normal';
+
+    // Update context card with custom info
+    const ctxCard = document.getElementById('contextCard');
+    const lines = desc.split('\n').filter(l => l.trim());
+    let role = currentScenario?.context?.role || 'Professional';
+    let company = currentScenario?.context?.company || '';
+    let extraDetails = '';
+
+    // Try to extract key info from the custom context
+    lines.forEach(line => {
+        const lower = line.toLowerCase();
+        if (lower.startsWith('role:')) role = line.split(':')[1]?.trim() || role;
+        if (lower.startsWith('company:')) company = line.split(':')[1]?.trim() || company;
+        if (lower.startsWith('salary:')) extraDetails += '💰 ' + line.split(':')[1]?.trim() + ' · ';
+        if (lower.startsWith('location:')) extraDetails += '📍 ' + line.split(':')[1]?.trim() + ' · ';
+        if (lower.startsWith('industry:')) extraDetails += '🏢 ' + line.split(':')[1]?.trim() + ' · ';
+    });
+
+    document.getElementById('ctxRoleTag').textContent = role;
+    document.getElementById('ctxJobTitle').textContent = role;
+    document.getElementById('ctxCompany').textContent = company;
+    if (extraDetails) {
+        document.getElementById('ctxSalary').textContent = extraDetails.replace(/· $/, '');
+    }
+    ctxCard.style.display = 'block';
+
+    // Close the panel
+    document.getElementById('customScenarioPanel').style.display = 'none';
+    document.getElementById('customToggleBtn').textContent = '✅ Customized ✓';
+
+    showToast('🎯 Scenario customized! Your context will be used in scoring.');
+}
+
+function resetCustomScenario() {
+    customScenarioActive = false;
+    customContextStr = '';
+    document.getElementById('customScenarioDesc').value = '';
+    document.getElementById('jobUrlInput').value = '';
+    document.getElementById('parseStatus').textContent = '';
+    document.getElementById('parseStatus').style.color = '';
+
+    // Restore original prompt
+    if (currentScenario) {
+        document.getElementById('promptText').textContent = currentScenario.prompt;
+        document.getElementById('promptText').style.fontStyle = 'italic';
+    }
+
+    // Restore original context card
+    const ctx = currentScenario?.context || {};
+    const ctxCard = document.getElementById('contextCard');
+    if (ctx.role || ctx.company) {
+        document.getElementById('ctxRoleTag').textContent = ctx.role || 'Professional';
+        document.getElementById('ctxJobTitle').textContent = ctx.job_title || ctx.role || 'Role';
+        document.getElementById('ctxCompany').textContent = ctx.company ? ctx.company + (ctx.location ? ' · ' + ctx.location : '') : '';
+        document.getElementById('ctxSalary').textContent = ctx.salary || '—';
+        ctxCard.style.display = 'block';
+    } else {
+        ctxCard.style.display = 'none';
+    }
+
+    document.getElementById('customToggleBtn').textContent = '✏️ Customize Scenario';
+    showToast('↩ Reset to default scenario.');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PHOTO CAPTURE (Dress & Presentation)
+// ═══════════════════════════════════════════════════════════════
+
+let photoStream = null;
+
+function startPhotoCapture(scenario) {
+    currentScenario = scenario;
+    const ctx = scenario.context || {};
+    document.getElementById('photoRoleTag').textContent = ctx.role || 'Professional';
+    document.getElementById('photoJobTitle').textContent = scenario.title;
+    document.getElementById('photoCompany').textContent = ctx.company || ctx.setting || '—';
+    document.getElementById('photoSetting').textContent = ctx.setting || '—';
+    document.getElementById('photoFormality').textContent = ctx.formality || '—';
+    document.getElementById('photoTip').textContent = ctx.tip || 'Stand in good light.';
+    document.getElementById('photoContextCard').style.display = 'block';
+    document.getElementById('captureBtn').disabled = true;
+    document.getElementById('captureHint').textContent = 'Starting camera...';
+    showView('view-photo');
+
+    navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'user', width: { ideal: 720 }, height: { ideal: 960 } },
+        audio: false
+    }).then(stream => {
+        photoStream = stream;
+        document.getElementById('photoVideo').srcObject = stream;
+        document.getElementById('captureBtn').disabled = false;
+        document.getElementById('captureHint').textContent = '📸 Tap to capture';
+    }).catch(() => {
+        document.getElementById('captureHint').textContent = '❌ Camera access denied.';
+        showToast('Camera permission required.');
+    });
+}
+
+function capturePhoto() {
+    const video = document.getElementById('photoVideo');
+    const canvas = document.createElement('canvas');
+    canvas.width = video.videoWidth || 720;
+    canvas.height = video.videoHeight || 960;
+    const ctx = canvas.getContext('2d');
+    ctx.scale(-1, 1);
+    ctx.drawImage(video, -canvas.width, 0, canvas.width, canvas.height);
+
+    document.getElementById('captureBtn').disabled = true;
+    document.getElementById('captureHint').textContent = 'Analyzing...';
+
+    // Stop camera
+    if (photoStream) {
+        photoStream.getTracks().forEach(t => t.stop());
+        photoStream = null;
+    }
+    if (video.srcObject) video.srcObject = null;
+
+    // Convert to blob and upload
+    canvas.toBlob(async (blob) => {
+        const ctxText = currentScenario.context || {};
+        const contextStr = `Role: ${ctxText.role || 'Any'}. Setting: ${ctxText.setting || 'General'}. Formality: ${ctxText.formality || 'Smart casual'}. ${ctxText.tip || ''}`;
+
+        const fd = new FormData();
+        fd.append('image', blob, 'outfit.jpg');
+        fd.append('scenario_id', currentScenario.id);
+        fd.append('scenario_title', currentScenario.title);
+        fd.append('outfit_context', contextStr);
+
+        try {
+            showToast('Analyzing your outfit...');
+            const resp = await fetch(API_BASE + '/api/analyze-outfit', { method: 'POST', body: fd });
+            if (!resp.ok) throw new Error('Server error');
+            const result = await resp.json();
+            showOutfitResults(result);
+        } catch (e) {
+            // Demo fallback
+            await new Promise(r => setTimeout(r, 800));
+            showOutfitResults(generateDemoOutfit(currentScenario));
+            showToast('Backend offline — demo analysis shown');
+        }
+    }, 'image/jpeg', 0.85);
+}
+
+function showOutfitResults(result) {
+    document.getElementById('outfitScenarioName').textContent = result.scenario_title || currentScenario.title;
+
+    // Overall score
+    const overall = result.overall_score || 5.0;
+    document.getElementById('outfitScore').textContent = overall.toFixed(1);
+    const verdict = result.verdict || 'review';
+    const vEl = document.getElementById('outfitVerdict');
+    vEl.textContent = verdict === 'pass' ? '✅ Ready to Go' : verdict === 'change' ? '❌ Needs Work' : '👀 Review Suggested';
+    vEl.style.background = verdict === 'pass' ? 'rgba(74,222,128,0.15)' : verdict === 'change' ? 'rgba(255,77,121,0.15)' : 'rgba(251,191,36,0.15)';
+    vEl.style.color = verdict === 'pass' ? 'var(--green)' : verdict === 'change' ? 'var(--pink)' : 'var(--gold)';
+
+    // Top tip
+    document.getElementById('outfitTopTipText').textContent = result.top_tip || 'No specific tip.';
+
+    // Facial hair
+    const fh = result.facial_hair || {};
+    document.getElementById('outfitFacialScore').textContent = (fh.score || 5.0).toFixed(1);
+    document.getElementById('outfitFacialFeedback').textContent = fh.feedback || '—';
+
+    // Clothing
+    const cl = result.clothing || {};
+    document.getElementById('outfitClothingScore').textContent = (cl.score || 5.0).toFixed(1);
+    document.getElementById('outfitClothingFeedback').textContent = cl.feedback || '—';
+
+    // Grooming
+    const gr = result.grooming || {};
+    document.getElementById('outfitGroomingScore').textContent = (gr.score || 5.0).toFixed(1);
+    document.getElementById('outfitGroomingFeedback').textContent = gr.feedback || '—';
+
+    showView('view-outfit-results');
+}
+
+function retakePhoto() {
+    if (currentScenario && currentScenario.id.startsWith('dress-')) {
+        startPhotoCapture(currentScenario);
+    }
+}
+
+function generateDemoOutfit(scenario) {
+    const scores = [6.5, 7.2, 8.0, 5.8, 7.5];
+    const s = scores[Math.floor(Math.random() * scores.length)];
+    const verdicts = ['pass', 'review', 'change'];
+    const v = verdicts[Math.floor(Math.random() * 3)];
+    return {
+        overall_score: s, scenario_title: scenario.title, scenario_id: scenario.id,
+        facial_hair: { score: parseFloat((Math.random()*3+5).toFixed(1)), feedback: 'Beard is tidy but could use a neckline cleanup.' },
+        clothing: { score: parseFloat((Math.random()*3+5).toFixed(1)), formality_fit: 'Good match', feedback: 'Shirt fits well. Consider ironing before the meeting.' },
+        grooming: { score: parseFloat((Math.random()*3+5).toFixed(1)), feedback: 'Overall presentation is solid. Shoes could be polished.' },
+        scenario_fit: parseFloat((Math.random()*3+5).toFixed(1)),
+        top_tip: 'A collared shirt instantly lifts your professional appearance. Stick to solid colours.',
+        verdict: v,
+        _is_demo: true
+    };
+}
+
+// ═══════════════════════════════════════════════════════════════
+// LEADERBOARD
+// ═══════════════════════════════════════════════════════════════
+
+function renderLeaderboard() {
+    const grid = document.getElementById('lbGrid');
+    grid.innerHTML = '';
+    const entries = Object.entries(gameState.completed)
+        .filter(([_,c]) => c.bestScore > 0)
+        .sort((a,b) => b[1].bestScore - a[1].bestScore);
+
+    if (entries.length === 0) {
+        grid.innerHTML = '<div class="empty-state"><div class="big-icon">🏆</div><p>No completed scenarios yet. Start practicing!</p></div>';
+        return;
+    }
+
+    entries.forEach(([id, c], idx) => {
+        const tierEmoji = c.difficulty === 'easy' ? '🟢' : c.difficulty === 'medium' ? '🟡' : '🔴';
+        const pos = idx < 3 ? ['top1','top2','top3'][idx] : '';
+        const row = document.createElement('div');
+        row.className = 'lb-row';
+        row.innerHTML = `
+            <div class="pos ${pos}">${idx===0?'🥇':idx===1?'🥈':idx===2?'🥉':'#'+(idx+1)}</div>
+            <div class="info">
+                <div class="sc-title">${c.title||id}</div>
+                <div class="sc-meta">${tierEmoji} ${c.difficulty} · ${c.totalAttempts||1} attempt${(c.totalAttempts||1)>1?'s':''}</div>
+            </div>
+            <div class="lb-score" style="color:${c.bestScore>=7?'var(--success)':'var(--fail)'}">${c.bestScore.toFixed(1)}</div>
+            <div class="lb-pts">🏆 ${c.points}</div>
+        `;
+        grid.appendChild(row);
+    });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// DEMO RESULTS
+// ═══════════════════════════════════════════════════════════════
+
+function generateDemoResults(scenario) {
+    const pace = Math.floor(Math.random()*60)+140;
+    const filler = Math.floor(Math.random()*8)+1;
+    const r = (min,max) => parseFloat((Math.random()*(max-min)+min).toFixed(1));
+    const catId = currentCategory?.id || '';
+    const activeKey = catId === 'sales-calls' ? 'closer' : catId === 'presentations' ? 'igniter' : 'comforter';
+    const baseScore = r(5.5, 8.5);
+    return {
+        scenario_id: scenario.id, scenario_title: scenario.title,
+        active_coach: activeKey,
+        coaches: {
+            comforter: {name:'The Comforter',emoji:'💙',focus:'Did you connect?',score: activeKey === 'comforter' ? baseScore : r(5,8), short:'General — warmth, clarity, confidence'},
+            closer: {name:'The Closer',emoji:'🔴',focus:'Did you land the deal?',score: activeKey === 'closer' ? baseScore : r(5,8), short:'Sales — directness, confidence, closure'},
+            igniter: {name:'The Igniter',emoji:'🟡',focus:'Did you bring energy?',score: activeKey === 'igniter' ? baseScore : r(5,8), short:'Presentations — energy, storytelling, variety'}
+        },
+        transcript: 'Demo transcript. Start the backend for real AI analysis.',
+        objective_metrics: {speaking_pace:pace, filler_word_count:filler,
+            filler_words_per_minute:parseFloat((filler/(scenario.max_duration/60)).toFixed(1)),
+            pause_ratio:0, total_words:Math.floor(pace*scenario.max_duration/60), duration_seconds:scenario.max_duration},
+        feedback: ['Demo feedback. Start the backend for real analysis.']
+    };
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════════════════════
+
+function showToast(msg) {
+    const t = document.getElementById('toast'); t.textContent = msg;
+    t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 3500);
+}
+</script>
+</body>
+</html>
