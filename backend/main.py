@@ -216,13 +216,21 @@ def score_ai_metrics(transcript: str, scenario_title: str, custom_context: str =
         '- engagement_hooks: Rhetorical questions, contrast, vivid language\n'
         '- closure: Did they land the ending or trail off?\n'
         '- warmth: Tone that makes listener feel comfortable vs cold\n\n'
-        'Example: {"directness": 8.5, "structure": 7.0, ...}'
+        'Additionally, include a "feedback" key — an array of 3-5 specific, actionable feedback items. '
+        'Each item should REFERENCE SOMETHING THE PERSON ACTUALLY SAID and explain how to improve it. '
+        'Be direct and honest — say things like:\n'
+        '- "You mentioned [X] but your tone stayed flat — that topic needs enthusiasm to land."\n'
+        '- "When you said [Y], it was unclear. Try adding a concrete example."\n'
+        '- "You rushed through [Z]. Slow down on the important points."\n'
+        '- "Your answer about [A] was strong, but you missed [B] — consider addressing both sides."\n\n'
+        'Example: {"directness": 8.5, "structure": 7.0, ..., "feedback": ["You said \"I worked on network upgrades\" but gave no specifics — what kind of upgrades? How big was the project?", "When you mentioned VLAN configuration you picked up speed and became hard to follow. Slow down on technical details."]}'
     )
     result = call_ollama_llm(prompt)
     defaults = {
         "directness": 5.0, "structure": 5.0, "confidence_markers": 5.0,
         "empathy_markers": 5.0, "positive_framing": 5.0, "specificity": 5.0,
-        "storytelling": 5.0, "engagement_hooks": 5.0, "closure": 5.0, "warmth": 5.0
+        "storytelling": 5.0, "engagement_hooks": 5.0, "closure": 5.0, "warmth": 5.0,
+        "feedback": []
     }
     try:
         json_match = re.search(r'\{[\s\S]+\}', result)
@@ -235,6 +243,8 @@ def score_ai_metrics(transcript: str, scenario_title: str, custom_context: str =
                 except (ValueError, TypeError):
                     scores[k] = defaults[k]
                 scores[k] = min(max(scores[k], 0.0), 10.0)
+            if not isinstance(scores.get("feedback"), list):
+                scores["feedback"] = defaults["feedback"]
             return scores
     except (json.JSONDecodeError, ValueError, TypeError):
         pass
@@ -399,8 +409,8 @@ def score_technical_explanation(transcript: str, scenario_title: str, scenario_c
         '- "structure": 0-10 — Logical flow: context → concept → example → summary?\n'
         '- "key_points_covered": 0-10 — Did they hit the important aspects of the topic?\n'
         '- "overall": 0-10 — Overall quality of the explanation\n'
-        '- "feedback": [array of 2-4 specific, actionable sentences about how to improve the technical explanation]\n\n'
-        'Example: {"accuracy": 8.0, "clarity": 7.0, "teaching_quality": 6.5, "depth": 5.0, "use_of_analogies": 7.5, "structure": 6.0, "key_points_covered": 7.0, "overall": 6.7, "feedback": ["You explained OSPF neighbours clearly, but you missed the DR/BDR election process on multi-access networks.", "Try adding a concrete example — walk through what happens when Router A sends a packet to Router C."]}'
+        '- "feedback": [array of 3-5 specific, actionable feedback items. Each item must reference something they ACTUALLY SAID and explain what was wrong or how to improve it. Be direct — say things like "You said OSPF uses Bellman-Ford — that\'s actually RIP. OSPF uses Dijkstra\'s SPF algorithm." or "You explained STP well but rushed the port states. Walk through blocking→listening→learning→forwarding slowly." or "When you described NAT, you didn\'t mention PAT — that\'s the most common form. Add it."]\n\n'
+        'Example: {"accuracy": 8.0, "clarity": 7.0, "teaching_quality": 6.5, "depth": 5.0, "use_of_analogies": 7.5, "structure": 6.0, "key_points_covered": 7.0, "overall": 6.7, "feedback": ["You said OSPF neighbours form automatically — close, but they need Hello packets on the same subnet with matching timers and area IDs. Walk through the Hello process.", "You mentioned Dijkstra but didn\'t explain the difference between SPF tree and the routing table. A quick example of how OSPF picks the best path would help.", "Your analogy of OSPF as a satnav was good! Try extending it — what happens when a road closes (link failure)?"]}'
     )
 
     result = call_ollama_llm(prompt)
@@ -512,49 +522,56 @@ def calculate_coach_scores(objective: dict, ai_scores: dict, audio: dict = None,
     # Return only the active coach + all coaches (frontend can choose)
     active_coach = all_coaches[active_coach_key]
 
-    # ── Feedback (based on active coach's focus AND category) ──
+    # ── Feedback — combine LLM-generated content feedback with objective metric tips ──
     feedback = []
-    # Categories where empathy/warmth feedback makes sense
+    
+    # Categories for specialised tips
     empathy_categories = {"job-interviews", "difficult-convos", "networking-relationships",
                           "client-management", "career-growth", "negotiation"}
-    # Categories where storytelling/energy feedback makes sense
     story_categories = {"presentations", "sales-calls", "networking-relationships"}
-    # Categories where directness feedback makes sense
     direct_categories = {"sales-calls", "negotiation", "difficult-convos", "client-management"}
+    
+    # Start with LLM-generated transcript-based feedback (specific, contextual)
+    llm_feedback = ai_scores.get("feedback", [])
+    if isinstance(llm_feedback, list):
+        feedback.extend(llm_feedback[:3])  # top 3
+    
+    # Add objective metric tips (measured from audio, not guessed)
     if pace_s < 6:
         if objective["speaking_pace"] > 180:
-            feedback.append("Try slowing down — you're speaking faster than ideal.")
+            feedback.append(f"Pacing: you averaged {objective['speaking_pace']:.0f} words/min — that's fast. Slow down on key points so they land.")
         elif objective["speaking_pace"] > 0:
-            feedback.append("Pick up the pace a little — you've got room to add energy.")
+            feedback.append(f"Pacing: you averaged {objective['speaking_pace']:.0f} words/min — you've got room to add more energy and presence.")
     if filler_s < 6:
-        feedback.append(f"Watch your filler words ({objective['filler_words_per_minute']}/min). Try replacing 'um' with a pause.")
+        feedback.append(f"Filler words: {objective['filler_words_per_minute']:.1f}/min — replace 'um' and 'like' with a short pause. It'll make you sound more deliberate.")
     if vocal_variety < 5:
-        feedback.append("Your voice stays flat. Vary your pitch — go up and down to keep people engaged.")
+        feedback.append(f"Voice: your pitch variation was narrow ({audio.get('pitch_std', 0):.0f}Hz range). Try deliberately changing pitch when switching topics to keep people engaged.")
     if volume_stab < 4:
-        feedback.append("Your volume is inconsistent. Try to stay at a steady, confident level throughout.")
+        feedback.append(f"Volume: your speaking volume varied a lot. Practice maintaining a steady, confident level — especially at the end of sentences where you tend to trail off.")
     if pause_mgmt < 4:
         pause_r = audio.get("pause_ratio", 0)
-        feedback.append(f"Too much dead air ({pause_r:.0%} silence). Plan what you'll say so you don't trail off.")
-    if ai_scores.get("directness", 5) < 6 and category_id in direct_categories:
-        feedback.append("Get to the point faster. In sales, hesitation costs the deal.")
-    if ai_scores.get("warmth", 5) < 6 and category_id in empathy_categories:
-        feedback.append("Add more warmth — smile, use their name, show you care.")
+        feedback.append(f"Pauses: {pause_r:.0%} of your recording was silence. Use pauses strategically (before important points), not as dead air while you think.")
+    
+    # Category-specific tips from coach
+    if category_id in direct_categories and ai_scores.get("directness", 5) < 6:
+        feedback.append(f"Directness: you circled around your point. Try leading with your answer first, then explaining why.")
+    if category_id in empathy_categories and ai_scores.get("warmth", 5) < 6:
+        feedback.append(f"Warmth: your tone came across as neutral. Try acknowledging the other person's situation before jumping in — it builds rapport.")
     if ai_scores.get("confidence_markers", 5) < 6:
-        feedback.append("Drop the hedging. Replace 'I think maybe' with 'I believe' or 'I know'.")
-    if ai_scores.get("storytelling", 5) < 6 and category_id in story_categories:
-        feedback.append("Tell a story, not a list. Set the scene, describe the tension, then the resolution.")
+        feedback.append(f"Confidence: you used a lot of hedging language ('I think', 'maybe', 'sort of'). Replace those with 'I believe', 'I know', or just state it directly.")
+    if category_id in story_categories and ai_scores.get("storytelling", 5) < 6:
+        feedback.append(f"Storytelling: you listed facts without a narrative. Pick one moment, describe the tension, then show how it resolved.")
     if ai_scores.get("closure", 5) < 6 and category_id in direct_categories:
-        feedback.append("Land the ending. Don't trail off — close with a strong statement.")
-    if category_id in empathy_categories and ai_scores.get("empathy_markers", 5) < 5:
-        feedback.append("Show you understand their perspective. Acknowledge their situation before jumping to solutions.")
+        feedback.append(f"Ending: you trailed off. Land your final point — a strong close is what people remember most.")
     if category_id == "presentations" and ai_scores.get("positive_framing", 5) < 5:
-        feedback.append("Reframe challenges as opportunities. 'This is a chance to...' beats 'This is a problem because...'")
+        feedback.append("Framing: you focused on problems. Reframe as opportunities — 'this is a chance to' beats 'this is a problem because'.")
     if category_id == "learning" and ai_scores.get("structure", 5) < 5:
-        feedback.append("Structure your explanation: start with the 'why', then the 'how', then an example.")
+        feedback.append("Structure: start with the 'why', then the 'how', then a concrete example — abstract concepts need a hook.")
     if category_id == "learning" and ai_scores.get("specificity", 5) < 5:
-        feedback.append("Use a concrete example or analogy. Abstract concepts stick better when you ground them.")
+        feedback.append("Examples: you stayed abstract. Ground every concept with a real-world analogy — CCNA topics stick when you connect them to something tangible.")
+    
     if not feedback:
-        feedback.append(f"Solid response! {active_coach['name']} is happy with that. Try another scenario to keep improving.")
+        feedback.append(f"Strong response! {active_coach['name']} is happy with that. Try another scenario to keep building.")
 
     return {
         "active_coach": active_coach_key,
