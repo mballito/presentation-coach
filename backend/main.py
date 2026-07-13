@@ -557,7 +557,7 @@ def calculate_coach_scores(objective: dict, ai_scores: dict, audio: dict = None,
         feedback.append(f"Directness: you circled around your point. Try leading with your answer first, then explaining why.")
     if category_id in empathy_categories and ai_scores.get("warmth", 5) < 6:
         feedback.append(f"Warmth: your tone came across as neutral. Try acknowledging the other person's situation before jumping in — it builds rapport.")
-    if ai_scores.get("confidence_markers", 5) < 6:
+    if ai_scores and ai_scores.get("confidence_markers", 5) < 6:
         feedback.append(f"Confidence: you used a lot of hedging language ('I think', 'maybe', 'sort of'). Replace those with 'I believe', 'I know', or just state it directly.")
     if category_id in story_categories and ai_scores.get("storytelling", 5) < 6:
         feedback.append(f"Storytelling: you listed facts without a narrative. Pick one moment, describe the tension, then show how it resolved.")
@@ -821,9 +821,28 @@ async def analyze_recording(
             "score": tech_scores.get("overall", 5.0),
             "short": "Technical accuracy, clarity, teaching quality"
         }
-        # Replace feedback with technical feedback
-        if tech_scores.get("feedback"):
-            result["feedback"] = tech_scores["feedback"]
+        # Replace feedback with technical feedback (LLM-generated or fallback from sub-scores)
+        tech_fb = tech_scores.get("feedback", [])
+        if tech_fb:
+            result["feedback"] = tech_fb
+        else:
+            # Generate helpful fallback feedback from sub-scores when LLM returned none
+            t = tech_scores
+            fallback = []
+            low = []
+            if t.get("accuracy", 5) < 6: low.append("accuracy — review the topic details before teaching again")
+            if t.get("depth", 5) < 6: low.append("depth — go beyond definitions, explain the 'how' and 'why'")
+            if t.get("use_of_analogies", 5) < 6: low.append("analogies — add a real-world comparison to make it stick")
+            if t.get("structure", 5) < 6: low.append("structure — start with context → concept → example → summary")
+            if t.get("clarity", 5) < 6: low.append("clarity — slow down and explain like teaching a beginner")
+            if t.get("key_points_covered", 5) < 6: low.append("key points — you missed some aspects the prompt asked about")
+            if low:
+                fallback.append(f"Room to improve: {'; '.join(low[:4])}.")
+            if t.get("teaching_quality", 5) >= 6:
+                fallback.append(f"👍 Teaching technique is solid — keep using examples and building from basics.")
+            if not fallback:
+                fallback.append(f"Solid attempt! Score: {t.get('overall', 5.0):.1f}/10. Aim for 7+ to pass.")
+            result["feedback"] = fallback
     else:
         ai_scores = score_ai_metrics(transcript, scenario_title, custom_context)
         result = calculate_coach_scores(objective, ai_scores, audio_metrics, category_id)
@@ -853,4 +872,11 @@ if frontend_dir.exists():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    ssl_dir = BASE_DIR.parent / "ssl"
+    ssl_kwargs = {}
+    if (ssl_dir / "cert.pem").exists() and (ssl_dir / "key.pem").exists():
+        ssl_kwargs = {
+            "ssl_certfile": str(ssl_dir / "cert.pem"),
+            "ssl_keyfile": str(ssl_dir / "key.pem"),
+        }
+    uvicorn.run(app, host="0.0.0.0", port=8001, **ssl_kwargs)
