@@ -1328,14 +1328,27 @@ function showResults(result) {
         if (!passed && result.transcript && !result.transcript.startsWith('[')) {
             rewriteContainer.style.display = 'block';
             rewriteContainer.innerHTML = `
-                <button id="rewriteBtn" class="action-btn" style="margin-top:1rem;background:linear-gradient(135deg,#a78bfa,#8b5cf6);">
-                    🎧 Hear a 9+ answer
+                <button id="rewriteBtn" style="
+                    display:block; width:100%; margin-top:1.25rem; margin-bottom:0.25rem;
+                    padding:1rem 1.5rem; border:none; border-radius:16px;
+                    background:linear-gradient(135deg,#7c3aed,#a78bfa);
+                    color:#fff; font-size:1.1rem; font-weight:700; letter-spacing:0.02em;
+                    cursor:pointer; transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+                    box-shadow:0 4px 24px rgba(139,92,246,0.35), 0 0 60px rgba(139,92,246,0.08);
+                    position:relative; overflow:hidden;
+                "
+                onmouseenter="this.style.transform='translateY(-2px) scale(1.02)'; this.style.boxShadow='0 8px 40px rgba(139,92,246,0.45), 0 0 80px rgba(139,92,246,0.12)'"
+                onmouseleave="this.style.transform=''; this.style.boxShadow='0 4px 24px rgba(139,92,246,0.35), 0 0 60px rgba(139,92,246,0.08)'"
+                >
+                    🎧 <span style="margin-left:0.3rem;">Hear a 9+ Answer</span>
                 </button>
                 <div id="rewriteResult" style="display:none;margin-top:1rem;">
                     <div id="rewriteText" style="background:rgba(255,255,255,0.04);border-radius:12px;padding:1rem;font-size:0.85rem;line-height:1.6;margin-bottom:0.75rem;white-space:pre-wrap;"></div>
                     <audio id="rewriteAudio" controls style="width:100%;border-radius:8px;"></audio>
                 </div>
-                <div id="rewriteLoading" style="display:none;margin-top:0.75rem;color:var(--text-muted);font-size:0.8rem;">⏳ Generating 9+ answer...</div>
+                <div id="rewriteLoading" style="display:none;margin-top:0.75rem;padding:0.75rem;text-align:center;color:var(--text-muted);font-size:0.85rem;font-weight:600;border-radius:12px;background:rgba(139,92,246,0.06);border:1px solid rgba(139,92,246,0.1);">
+                    <span style="display:inline-block;animation:pulse 1.2s infinite;">✨</span> Rewriting your answer into a 9+ version…
+                </div>
             `;
             document.getElementById('rewriteBtn').onclick = async () => {
                 const rl = document.getElementById('rewriteLoading'); rl.style.display = 'block';
