@@ -1342,7 +1342,7 @@ function showResults(result) {
     // Rewrite button — show 9+ answer option on failed attempts
     const rewriteContainer = document.getElementById('rewriteContainer');
     if (rewriteContainer) {
-        if (!passed && result.transcript && !result.transcript.startsWith('[')) {
+        if (result.transcript && !result.transcript.startsWith('[')) {
             rewriteContainer.style.display = 'block';
             rewriteContainer.innerHTML = `
                 <button id="rewriteBtn" style="
