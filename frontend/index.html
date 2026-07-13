@@ -1286,20 +1286,37 @@ function showResults(result) {
         // Show technical metrics if available
         if (result.tech_scores) {
             const t = result.tech_scores;
+            const metricDefs = {
+                accuracy: { label: 'Accuracy', desc: 'Were you factually correct? Did you get any concepts wrong?', hint: 'Review the topic and practice explaining it without notes.' },
+                clarity: { label: 'Clarity', desc: 'Could a beginner follow this explanation?', hint: 'Pretend you\'re teaching someone who knows nothing about the topic.' },
+                teaching_quality: { label: 'Teaching Quality', desc: 'Did you use good teaching techniques — analogies, examples, building from basics?', hint: 'Start with the big picture, then zoom into details.' },
+                depth: { label: 'Depth', desc: 'Did you go beyond surface-level definitions into the "how" and "why"?', hint: 'Ask yourself "why does this matter?" and answer it.' },
+                use_of_analogies: { label: 'Analogies', desc: 'How effective were your real-world comparisons?', hint: 'A strong analogy connects a technical concept to something the listener already understands.' },
+                structure: { label: 'Structure', desc: 'Logical flow — context → concept → example → summary?', hint: 'Give your answer a clear beginning, middle, and end.' }
+            };
+            const metricKeys = ['accuracy','clarity','teaching_quality','depth','use_of_analogies','structure'];
+            let metricRows = '';
+            metricKeys.forEach(key => {
+                const def = metricDefs[key];
+                const val = (t[key] || 5);
+                const pct = (val / 10) * 100;
+                metricRows += `
+                    <div class="metric-row clickable" onclick="toggleMetricDetail(this)" data-key="${key}" style="cursor:pointer;">
+                        <span class="label">${def.label} <span class="expand-icon" style="font-size:0.55rem;opacity:0.4;margin-left:0.2rem;">▼</span></span>
+                        <span class="val">${val.toFixed(1)}</span>
+                    </div>
+                    <div class="metric-track"><div class="fill" style="width:${pct}%"></div></div>
+                    <div class="metric-detail" style="display:none;padding:0.5rem 0.65rem;margin-bottom:0.4rem;background:rgba(255,255,255,0.03);border-radius:8px;font-size:0.75rem;line-height:1.5;border-left:2px solid rgba(139,92,246,0.3);">
+                        <div style="color:var(--text-muted);margin-bottom:0.25rem;">${def.desc}</div>
+                        <div style="color:var(--cyan);font-size:0.7rem;">💡 ${def.hint}</div>
+                    </div>`;
+            });
             extraHTML = `<div style="margin-top:0.75rem;border-top:1px solid rgba(255,255,255,0.06);padding-top:0.6rem;">
-                <div style="font-size:0.65rem;font-weight:600;color:var(--text-muted);margin-bottom:0.35rem;">📊 Technical Breakdown</div>
-                <div class="metric-row"><span class="label">Accuracy</span><span class="val">${(t.accuracy||5).toFixed(1)}</span></div>
-                <div class="metric-track"><div class="fill" style="width:${((t.accuracy||5)/10)*100}%"></div></div>
-                <div class="metric-row"><span class="label">Clarity</span><span class="val">${(t.clarity||5).toFixed(1)}</span></div>
-                <div class="metric-track"><div class="fill" style="width:${((t.clarity||5)/10)*100}%"></div></div>
-                <div class="metric-row"><span class="label">Teaching Quality</span><span class="val">${(t.teaching_quality||5).toFixed(1)}</span></div>
-                <div class="metric-track"><div class="fill" style="width:${((t.teaching_quality||5)/10)*100}%"></div></div>
-                <div class="metric-row"><span class="label">Depth</span><span class="val">${(t.depth||5).toFixed(1)}</span></div>
-                <div class="metric-track"><div class="fill" style="width:${((t.depth||5)/10)*100}%"></div></div>
-                <div class="metric-row"><span class="label">Analogies</span><span class="val">${(t.use_of_analogies||5).toFixed(1)}</span></div>
-                <div class="metric-track"><div class="fill" style="width:${((t.use_of_analogies||5)/10)*100}%"></div></div>
-                <div class="metric-row"><span class="label">Structure</span><span class="val">${(t.structure||5).toFixed(1)}</span></div>
-                <div class="metric-track"><div class="fill" style="width:${((t.structure||5)/10)*100}%"></div></div>
+                <div style="font-size:0.65rem;font-weight:600;color:var(--text-muted);margin-bottom:0.35rem;display:flex;justify-content:space-between;align-items:center;">
+                    <span>📊 Technical Breakdown</span>
+                    <span style="font-size:0.6rem;color:var(--text-muted);opacity:0.5;">Tap a metric for details</span>
+                </div>
+                ${metricRows}
             </div>`;
         }
         card.innerHTML = `
@@ -1750,6 +1767,25 @@ function generateDemoResults(scenario) {
 // ═══════════════════════════════════════════════════════════════
 // TOAST
 // ═══════════════════════════════════════════════════════════════
+
+function toggleMetricDetail(row) {
+    const detail = row.nextElementSibling.nextElementSibling; // skip the metric-track div
+    const icon = row.querySelector('.expand-icon');
+    if (!detail || !detail.classList.contains('metric-detail')) return;
+    const isOpen = detail.style.display !== 'none';
+    detail.style.display = isOpen ? 'none' : 'block';
+    if (icon) icon.textContent = isOpen ? '▼' : '▲';
+    // Animate height
+    if (!isOpen) {
+        detail.style.opacity = '0';
+        detail.style.transform = 'translateY(-4px)';
+        requestAnimationFrame(() => {
+            detail.style.transition = 'all 0.2s ease';
+            detail.style.opacity = '1';
+            detail.style.transform = 'translateY(0)';
+        });
+    }
+}
 
 function showToast(msg) {
     const t = document.getElementById('toast'); t.textContent = msg;
