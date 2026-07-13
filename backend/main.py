@@ -897,12 +897,13 @@ async def rewrite_answer(
         role_prompt +
         'The student gave the following response. Your job is to rewrite it as a 9+ out of 10 answer. '
         + quality_prompt +
-        'Keep the same general length and tone as if the SAME PERSON said it. Just make it a much better version.\n\n'
+        'IMPORTANT: This is a spoken conversation, not a written report. Write it the way someone would EXPLAIN this to a colleague or student face-to-face — natural, conversational, with a bit of warmth. Use connecting phrases like \"So the key thing here is…\" or \"What you really want to remember is…\" or \"Let me break that down.\" Avoid bullet points, headings, textbook language, or anything that sounds like a Google search result or a written brief. '
+        'Keep the same general length and casual speaking tone as if the SAME PERSON said it. Just make it a much better version.\n\n'
         f'Scenario: "{scenario_title}"\n'
         f'Context: "{tip_info}"\n\n'
         f"The student's original answer:\n{transcript}\n\n"
         'Return ONLY the rewritten answer text. No JSON, no markdown, no commentary, no labels. '
-        'Just the improved answer as if the student said it themselves.'
+        'Just the improved answer in natural conversational English.'
     )
 
     # Call Ollama for rewrite
@@ -927,7 +928,7 @@ async def rewrite_answer(
     try:
         import edge_tts
         tts_text = rewritten[:2000]
-        communicate = edge_tts.Communicate(tts_text, "en-GB-SoniaNeural")
+        communicate = edge_tts.Communicate(tts_text, "en-GB-RyanNeural")
         await communicate.save(str(audio_path))
     except Exception as e:
         return {"rewritten": rewritten, "audio_url": "", "error": f"TTS failed: {str(e)}"}
