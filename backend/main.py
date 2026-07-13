@@ -75,6 +75,8 @@ BASE_DIR = Path(__file__).parent
 SCENARIOS_PATH = BASE_DIR / "scenarios.json"
 RECORDINGS_DIR = BASE_DIR / "recordings"
 RECORDINGS_DIR.mkdir(exist_ok=True)
+AUDIO_DIR = BASE_DIR / "audio_output"
+AUDIO_DIR.mkdir(exist_ok=True)
 
 OLLAMA_URL = "http://localhost:11434/api/generate"
 OLLAMA_MODEL = "hermes3:3b"
@@ -855,6 +857,76 @@ async def analyze_recording(
     return result
 
 
+@app.post("/api/rewrite")
+async def rewrite_answer(
+    transcript: str = Form(...),
+    scenario_id: str = Form(...),
+    scenario_title: str = Form("Unknown Scenario")
+):
+    """Rewrite a user's transcript into a 9+ answer and generate TTS audio."""
+    if not transcript or transcript.startswith("["):
+        raise HTTPException(400, "No valid transcript to rewrite")
+
+    # Look up scenario context
+    ctx = {}
+    try:
+        all_scenarios_raw = load_scenarios()
+        for cat in all_scenarios_raw.get("categories", []):
+            for s in cat.get("scenarios", []):
+                if s["id"] == scenario_id:
+                    ctx = s.get("context", {})
+                    break
+    except Exception:
+        pass
+
+    tip_info = ctx.get("teaching_tip", "")
+
+    prompt = (
+        'You are a senior Cisco Networking instructor evaluating a student. '
+        'The student gave the following explanation. Your job is to rewrite it as a 9+ out of 10 answer. '
+        'Make it excellent: accurate, clear, well-structured, with analogies, proper depth, and all key points covered. '
+        'Keep the same general length and tone as if the SAME PERSON said it. Just make it a much better version.\n\n'
+        f'Topic: "{scenario_title}"\n'
+        f'Teaching tip: "{tip_info}"\n\n'
+        f"The student's original answer:\n{transcript}\n\n"
+        'Return ONLY the rewritten answer text. No JSON, no markdown, no commentary, no labels. '
+        'Just the improved answer as if the student said it themselves.'
+    )
+
+    # Call Ollama for rewrite
+    payload = {
+        "model": OLLAMA_MODEL, "prompt": prompt,
+        "stream": False, "temperature": 0.4, "max_tokens": 2048
+    }
+    try:
+        resp = httpx.post(OLLAMA_URL, json=payload, timeout=120)
+        rewritten = ""
+        if resp.status_code == 200:
+            rewritten = resp.json().get("response", "")
+        if not rewritten:
+            return {"rewritten": "", "audio_url": "", "error": "LLM returned empty response"}
+    except Exception as e:
+        return {"rewritten": "", "audio_url": "", "error": str(e)}
+
+    # Generate TTS audio
+    audio_filename = f"rewrite_{scenario_id}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.mp3"
+    audio_path = AUDIO_DIR / audio_filename
+
+    try:
+        import edge_tts
+        tts_text = rewritten[:2000]
+        communicate = edge_tts.Communicate(tts_text, "en-GB-SoniaNeural")
+        await communicate.save(str(audio_path))
+    except Exception as e:
+        return {"rewritten": rewritten, "audio_url": "", "error": f"TTS failed: {str(e)}"}
+
+    return {
+        "rewritten": rewritten,
+        "audio_url": f"/audio/{audio_filename}",
+        "error": ""
+    }
+
+
 @app.get("/api/health")
 def health():
     return {
@@ -868,6 +940,9 @@ def health():
 frontend_dir = BASE_DIR.parent / "frontend"
 if frontend_dir.exists():
     app.mount("/", StaticFiles(directory=str(frontend_dir), html=True), name="frontend")
+
+# Serve audio files
+app.mount("/audio", StaticFiles(directory=str(AUDIO_DIR)), name="audio")
 
 
 if __name__ == "__main__":
