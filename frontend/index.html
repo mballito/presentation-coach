@@ -573,6 +573,7 @@
         <h3>💡 Tips to Improve</h3>
         <ul class="feedback-list" id="feedbackList"></ul>
     </div>
+    <div id="rewriteContainer"></div>
     <h3 style="margin-bottom:0.6rem;font-size:0.95rem;">📊 Speaking Stats</h3>
     <div class="metrics-grid" id="metricsGrid"></div>
     <h3 style="margin-bottom:0.6rem;font-size:0.95rem;">📝 Transcript</h3>
@@ -1320,6 +1321,56 @@ function showResults(result) {
     (result.feedback||['Good job!']).forEach(tip => {
         const li = document.createElement('li'); li.textContent = tip; fl.appendChild(li);
     });
+
+    // Rewrite button — show 9+ answer option on failed attempts
+    const rewriteContainer = document.getElementById('rewriteContainer');
+    if (rewriteContainer) {
+        if (!passed && result.transcript && !result.transcript.startsWith('[')) {
+            rewriteContainer.style.display = 'block';
+            rewriteContainer.innerHTML = `
+                <button id="rewriteBtn" class="action-btn" style="margin-top:1rem;background:linear-gradient(135deg,#a78bfa,#8b5cf6);">
+                    🎧 Hear a 9+ answer
+                </button>
+                <div id="rewriteResult" style="display:none;margin-top:1rem;">
+                    <div id="rewriteText" style="background:rgba(255,255,255,0.04);border-radius:12px;padding:1rem;font-size:0.85rem;line-height:1.6;margin-bottom:0.75rem;white-space:pre-wrap;"></div>
+                    <audio id="rewriteAudio" controls style="width:100%;border-radius:8px;"></audio>
+                </div>
+                <div id="rewriteLoading" style="display:none;margin-top:0.75rem;color:var(--text-muted);font-size:0.8rem;">⏳ Generating 9+ answer...</div>
+            `;
+            document.getElementById('rewriteBtn').onclick = async () => {
+                const rl = document.getElementById('rewriteLoading'); rl.style.display = 'block';
+                const rb = document.getElementById('rewriteBtn'); rb.disabled = true; rb.style.opacity = '0.5';
+                const fd = new FormData();
+                fd.append('transcript', result.transcript);
+                fd.append('scenario_id', result.scenario_id || currentScenario.id);
+                fd.append('scenario_title', result.scenario_title || currentScenario.title);
+                fd.append('category_id', currentScenario.categoryId || '');
+                try {
+                    const resp = await fetch('/api/rewrite', { method: 'POST', body: fd });
+                    const data = await resp.json();
+                    rl.style.display = 'none'; rb.style.display = 'none';
+                    if (data.rewritten) {
+                        const rr = document.getElementById('rewriteResult'); rr.style.display = 'block';
+                        document.getElementById('rewriteText').textContent = data.rewritten;
+                        if (data.audio_url) {
+                            const audio = document.getElementById('rewriteAudio');
+                            audio.src = data.audio_url;
+                            audio.load();
+                        }
+                    } else {
+                        document.getElementById('rewriteResult').style.display = 'block';
+                        document.getElementById('rewriteText').textContent = '⚠️ ' + (data.error || 'Could not generate rewrite.');
+                    }
+                } catch (e) {
+                    rl.style.display = 'none'; rb.disabled = false; rb.style.opacity = '1';
+                    document.getElementById('rewriteResult').style.display = 'block';
+                    document.getElementById('rewriteText').textContent = '⚠️ Network error. Try again.';
+                }
+            };
+        } else {
+            rewriteContainer.style.display = 'none';
+        }
+    }
 
     // Metrics
     const mg = document.getElementById('metricsGrid'); mg.innerHTML = '';

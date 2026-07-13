@@ -861,7 +861,8 @@ async def analyze_recording(
 async def rewrite_answer(
     transcript: str = Form(...),
     scenario_id: str = Form(...),
-    scenario_title: str = Form("Unknown Scenario")
+    scenario_title: str = Form("Unknown Scenario"),
+    category_id: str = Form("learning")
 ):
     """Rewrite a user's transcript into a 9+ answer and generate TTS audio."""
     if not transcript or transcript.startswith("["):
@@ -879,15 +880,26 @@ async def rewrite_answer(
     except Exception:
         pass
 
-    tip_info = ctx.get("teaching_tip", "")
+    tip_info = ctx.get("teaching_tip", ctx.get("interviewer_tip", ""))
+
+    # Pick prompt style based on category
+    if category_id == "learning":
+        role_prompt = "You are a senior Cisco Networking instructor evaluating a student. "
+        quality_prompt = "Make it excellent: accurate, clear, well-structured, with analogies, proper depth, and all key points covered. "
+    elif category_id == "sales-calls":
+        role_prompt = "You are a top sales closer and communication coach. "
+        quality_prompt = "Make it excellent: direct, confident, persuasive, with strong framing and a clear ask. "
+    else:
+        role_prompt = "You are a professional communication coach. "
+        quality_prompt = "Make it excellent: clear, confident, well-structured, with specific examples and a strong close. "
 
     prompt = (
-        'You are a senior Cisco Networking instructor evaluating a student. '
-        'The student gave the following explanation. Your job is to rewrite it as a 9+ out of 10 answer. '
-        'Make it excellent: accurate, clear, well-structured, with analogies, proper depth, and all key points covered. '
+        role_prompt +
+        'The student gave the following response. Your job is to rewrite it as a 9+ out of 10 answer. '
+        + quality_prompt +
         'Keep the same general length and tone as if the SAME PERSON said it. Just make it a much better version.\n\n'
-        f'Topic: "{scenario_title}"\n'
-        f'Teaching tip: "{tip_info}"\n\n'
+        f'Scenario: "{scenario_title}"\n'
+        f'Context: "{tip_info}"\n\n'
         f"The student's original answer:\n{transcript}\n\n"
         'Return ONLY the rewritten answer text. No JSON, no markdown, no commentary, no labels. '
         'Just the improved answer as if the student said it themselves.'
