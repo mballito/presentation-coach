@@ -948,13 +948,13 @@ def health():
     }
 
 
+# Serve audio files (must be BEFORE the frontend catch-all mount)
+app.mount("/audio", StaticFiles(directory=str(AUDIO_DIR)), name="audio")
+
 # Serve frontend
 frontend_dir = BASE_DIR.parent / "frontend"
 if frontend_dir.exists():
     app.mount("/", StaticFiles(directory=str(frontend_dir), html=True), name="frontend")
-
-# Serve audio files
-app.mount("/audio", StaticFiles(directory=str(AUDIO_DIR)), name="audio")
 
 
 if __name__ == "__main__":
